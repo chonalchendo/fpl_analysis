@@ -1,21 +1,24 @@
-from pathlib import Path
-import sys; sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-
 import time
 
 import pandas as pd
-from rich import print
 
+from feature_pipeline.settings import SOURCE
 from feature_pipeline.utils import get_logger
 from .validation import PlayerHistory
 from feature_pipeline.apis import players_api, get_player_ids, BASE
-from .transform import transform
 
 logger = get_logger(__name__)
 
 
 def unpack_stats(player_id: str) -> list[PlayerHistory]:
+    """Unpack player stats from API response.
+
+    Args:
+        player_id (str): player id
+
+    Returns:
+        list[PlayerHistory]: list of PlayerHistory objects
+    """
     resp = players_api(player_id)
     if not resp:
         logger.info("No player stats found in JSON response.")
@@ -23,6 +26,11 @@ def unpack_stats(player_id: str) -> list[PlayerHistory]:
 
 
 def from_api() -> tuple[pd.DataFrame, dict[str, str]]:
+    """Load player data from API.
+
+    Returns:
+        tuple[pd.DataFrame, dict[str, str]]: player dataframe and metadata
+    """
     player_ids = get_player_ids()
     ids = [player["id"] for player in player_ids]
 
@@ -50,27 +58,14 @@ def from_file() -> tuple[pd.DataFrame, dict[str, str]]:
     Returns:
         pd.DataFrame: player dataframe
     """
-    root = Path(__file__).parent.parent
-    path = f"{root}/data/raw/player_data.pkl"
-    
+    path = f"{SOURCE}/data/raw/player_data.pkl"
+
     df = pd.read_pickle(path)
-    
+
     metadata = {
         "description": "Individual player data for each game of the 2023/24 season",
         "url": f"{BASE}/element-summary/<PLAYER_ID>/",
-        'file_path': path,
+        "file_path": path,
         "datetime_format": "%Y-%m-%dT%H:%M:%SZ",
     }
     return df, metadata
-
-
-if __name__ == "__main__":
-    root = Path(__file__).parent.parent
-    path = f"{root}/data/raw/player_data.pkl"
-    
-    df = pd.read_pickle(path)
-    df = transform(df)
-    df.columns
-    # df, metadata = extract()
-
-    # df.to_pickle(path)

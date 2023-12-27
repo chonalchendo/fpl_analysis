@@ -208,6 +208,20 @@ def add_player_names(player_stats: pd.DataFrame) -> pd.DataFrame:
     return player_stats
 
 
+def add_team_difficulty(player_stats: pd.DataFrame) -> pd.DataFrame:
+    """Add team difficulty to player stats.
+
+    Args:
+        player_stats (pd.DataFrame): player stats.
+
+    Returns:
+        pd.DataFrame: Dataframe with team difficulty.
+    """
+    teams = map_team_stats("strength")
+    player_stats["team_difficulty"] = player_stats["opponent_team_id"].map(teams)
+    return player_stats
+
+
 # def transform_teams_fixtures(
 #     teams: pd.DataFrame, fixtures: pd.DataFrame
 # ) -> pd.DataFrame:
@@ -324,4 +338,5 @@ def transform(players_df: pd.DataFrame) -> pd.DataFrame:
     players_df = change_column_names(players_df)
     players_df = add_season_column(players_df, "2023-24")
     players_df = add_time_column(players_df)
+    players_df = add_team_difficulty(players_df)
     return players_df

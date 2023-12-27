@@ -1,6 +1,6 @@
 import pandas as pd
 import hopsworks
-from sqlalchemy import create_engine, Connection
+from feature_pipeline.database import create_database_connection
 from great_expectations.core import ExpectationSuite
 from hsfs.feature_group import FeatureGroup
 from hsfs.feature_store import FeatureStore
@@ -92,16 +92,6 @@ def to_feature_store(
     feature_group.compute_statistics()
 
     return feature_group
-
-
-def create_database_connection() -> Connection:
-    """Create connection to SQL database.
-
-    Returns:
-        Connection: Connection to SQL database.
-    """
-    engine = create_engine(SETTINGS["SQLALCHEMY_DATABASE_URI"])
-    return engine.connect()
 
 
 def to_sql_database(data: pd.DataFrame, table_name: str) -> None:

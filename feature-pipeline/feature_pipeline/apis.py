@@ -1,5 +1,6 @@
 import httpx
 import pandas as pd
+from rich import print
 from httpx import Response
 from feature_pipeline.etl.validation import PlayerInfo
 from feature_pipeline.utils import get_logger
@@ -87,3 +88,10 @@ def map_team_stats(col: str) -> dict[int, str]:
     teams = get_teams_data()
     # return {k["id"]: k[col] for k in teams}
     return dict(zip(teams["id"], teams[col]))
+
+
+if __name__ == "__main__":
+    url = 'https://fbref.com/en/comps/Big5/gca/players/Big-5-European-Leagues-Stats#stats_gca'
+    df = pd.read_html(url)
+    
+    print(df)
