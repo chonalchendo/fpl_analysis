@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from functools import reduce
 from typing import Callable
-from feature_pipeline.apis import get_player_ids, map_team_stats
+from feature_pipeline.apis.fpl import get_player_ids, map_team_stats
 
 
 def string_to_int(players_df: pd.DataFrame) -> pd.DataFrame:

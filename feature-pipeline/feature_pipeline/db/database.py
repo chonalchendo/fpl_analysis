@@ -1,7 +1,7 @@
 import psycopg2
 from sqlalchemy.engine import Connection, create_engine
-from feature_pipeline.utils import get_logger
-from feature_pipeline.settings import SETTINGS
+from feature_pipeline.utilities.utils import get_logger
+from feature_pipeline.core.settings import SETTINGS
 
 
 logger = get_logger(__name__)

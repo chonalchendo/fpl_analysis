@@ -1,5 +1,5 @@
 from feature_pipeline.etl import extract, transform, load
-from feature_pipeline import utils
+from feature_pipeline.utilities import utils
 
 logger = utils.get_logger(__name__)
 

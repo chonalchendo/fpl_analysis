@@ -37,8 +37,9 @@ def get_root_dir(default_value: str = ".") -> Path:
 def get_root_path():
     return Path(__file__).parent.parent
 
+
 def get_source_path():
-    return Path(__file__).parent   
+    return Path(__file__).parent
 
 
 ROOT = get_root_path()

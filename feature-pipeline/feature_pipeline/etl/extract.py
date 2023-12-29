@@ -2,10 +2,10 @@ import time
 
 import pandas as pd
 
-from feature_pipeline.settings import SOURCE
-from feature_pipeline.utils import get_logger
+from feature_pipeline.core.settings import SOURCE
+from feature_pipeline.utilities.utils import get_logger
 from .validation import PlayerHistory
-from feature_pipeline.apis import players_api, get_player_ids, BASE
+from feature_pipeline.apis.fpl import players_api, get_player_ids, BASE
 
 logger = get_logger(__name__)
 

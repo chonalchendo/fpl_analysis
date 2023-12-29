@@ -1,10 +1,10 @@
 import pandas as pd
 import hopsworks
-from feature_pipeline.database import create_database_connection
+from feature_pipeline.db.database import create_database_connection
 from great_expectations.core import ExpectationSuite
 from hsfs.feature_group import FeatureGroup
 from hsfs.feature_store import FeatureStore
-from feature_pipeline.settings import SETTINGS
+from feature_pipeline.core.settings import SETTINGS
 
 
 def connect_to_feature_store() -> FeatureStore:
