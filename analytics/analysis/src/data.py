@@ -1,8 +1,8 @@
 import sqlalchemy
 from sqlalchemy import Connection
 import pandas as pd
-from analysis.settings import SETTINGS
-from analysis.utils import get_logger
+from analysis.core.settings import SETTINGS
+from analysis.utilities.utils import get_logger
 
 
 logger = get_logger(__name__)

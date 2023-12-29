@@ -14,9 +14,9 @@ from analysis.src.models import (
     model_evaluation_pipeline,
 )
 from analysis.src.data import db
-from analysis.utils import get_logger
-from analysis.model_manager import save
-from analysis.config import grid_params, random_params
+from analysis.utilities.utils import get_logger
+from analysis.models.model_manager import save
+from analysis.models.hyperparamter_config import grid_params, random_params
 from analysis.src.hyperparameter_tuning import (
     grid_search_tuning,
     randomized_search_tuning,
@@ -27,6 +27,12 @@ logger = get_logger(__name__)
 
 
 def train(models: list[Any], names: list[str]) -> None:
+    """Train and output the best model to the gcp bucket.
+
+    Args:
+        models (list[Any]): Regression models to consider
+        names (list[str]): Names of each regression model
+    """
     logger.info("Querying data from the database")
     data = db.query("SELECT * FROM player_stats")
 
@@ -37,7 +43,7 @@ def train(models: list[Any], names: list[str]) -> None:
     X_train, y_train = split_x_y_vars(train_set)
 
     logger.info("Transforming X_train data")
-    X_train_prepared = X_transformation_pipeline(X_train)
+    X_train_prepared, _ = X_transformation_pipeline(X_train)
 
     logger.info("Data has been loaded and transformed - ready for training")
 
@@ -48,7 +54,7 @@ def train(models: list[Any], names: list[str]) -> None:
     logger.info(f"The best model is: {best_model}")
 
     # tune best model
-    logger.info(f"Tuning the {best_model}")
+    logger.info(f"Tuning {best_model}")
 
     # grid search
     logger.info("Grid search tuning")
@@ -67,7 +73,9 @@ def train(models: list[Any], names: list[str]) -> None:
     # build model on test data and evaluate which is the best
     logger.info("Building models on test data")
     X_test, y_test = split_x_y_vars(test_set)
-    X_test_prepared = X_transformation_pipeline(X_test)
+
+    # transform X_test data and save the transformer
+    X_test_prepared, transform_pipeline = X_transformation_pipeline(X_test)
 
     logger.info("Evaluating the best hypertuning method on the test data")
 
@@ -95,6 +103,7 @@ def train(models: list[Any], names: list[str]) -> None:
         predictions=final_pred,
         mean_cv_score=final_cv_rmse_score,
         X=X_test,
+        X_transformer=transform_pipeline,
         y=y_test,
         file_name="points_prediction_model.pkl",
     )

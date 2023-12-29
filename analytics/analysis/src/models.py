@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Any
-from analysis.utils import get_logger
+from analysis.utilities.utils import get_logger
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestRegressor
@@ -18,7 +18,7 @@ def display_scores(rmse: np.ndarray) -> None:
         rmse (np.ndarray): RMSE score
     """
     logger.info(
-        f"RMSE: {rmse}\n Mean: {rmse.mean()}\n Standard deviation: {rmse.std()}"
+        f"\n RMSE: {rmse}\n Mean: {rmse.mean()}\n Standard deviation: {rmse.std()}"
     )
 
 

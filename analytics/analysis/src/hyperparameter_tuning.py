@@ -2,9 +2,6 @@ from typing import Any
 import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-# import joblib
-# from analysis.settings import ROOT
-
 
 def hyperparameter_tuning_results(
     cv_results: dict[str, np.ndarray]
@@ -83,11 +80,3 @@ def randomized_search_tuning(
     rnd_search.fit(X_train, y_train)
 
     return rnd_search.best_estimator_, rnd_search.cv_results_
-
-
-# -------------------------------- Save model -------------------------------- #
-
-# PATH = f"{ROOT}/analysis/models/forest_reg_model.pkl"
-
-# # save model
-# joblib.dump(final_model, PATH)

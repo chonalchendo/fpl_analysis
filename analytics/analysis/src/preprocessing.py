@@ -80,4 +80,4 @@ def X_transformation_pipeline(X: np.ndarray) -> np.ndarray:
         ]
     )
 
-    return preprocess_pipeline.fit_transform(X)
+    return preprocess_pipeline.fit_transform(X), preprocess_pipeline
