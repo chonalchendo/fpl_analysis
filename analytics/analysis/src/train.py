@@ -8,18 +8,17 @@ from analysis.src.preprocessing import (
     X_transformation_pipeline,
 )
 from analysis.src.models import (
-    build_model,
     calculate_rmse,
     confidence_interval,
     model_evaluation_pipeline,
+    build_pipeline,
 )
 from analysis.src.data import db
 from analysis.utilities.utils import get_logger
 from analysis.models.model_manager import save
 from analysis.models.hyperparamter_config import grid_params, random_params
 from analysis.src.hyperparameter_tuning import (
-    grid_search_tuning,
-    randomized_search_tuning,
+    hyperparameter_tuning,
 )
 
 
@@ -43,52 +42,44 @@ def train(models: list[Any], names: list[str]) -> None:
     X_train, y_train = split_x_y_vars(train_set)
 
     logger.info("Transforming X_train data")
-    X_train_prepared, _ = X_transformation_pipeline(X_train)
+    # X_train_prepared, _ = X_transformation_pipeline(X_train)
+    X_train_preprocessor = X_transformation_pipeline(X_train)
 
     logger.info("Data has been loaded and transformed - ready for training")
 
+    logger.info("Create model pipelines")
+    model_pipelines = [
+        (name, build_pipeline(model, X_train_preprocessor))
+        for name, model in zip(names, models)
+    ]
+
     logger.info("Building regression models")
-    best_model, _ = model_evaluation_pipeline(
-        names=names, models=models, X=X_train_prepared, y=y_train
+    best_model_pipeline = model_evaluation_pipeline(
+        model_pipelines=model_pipelines,
+        X=X_train,
+        y=y_train,
     )
-    logger.info(f"The best model is: {best_model}")
+    logger.info(f"The best model is: {best_model_pipeline}")
 
     # tune best model
-    logger.info(f"Tuning {best_model}")
+    logger.info(f"Tuning {best_model_pipeline}")
 
-    # grid search
-    logger.info("Grid search tuning")
-    gs_best_estimator, _ = grid_search_tuning(
-        best_model, grid_params, X_train_prepared, y_train
+    final_model, final_model_rmse = hyperparameter_tuning(
+        regressor=best_model_pipeline,
+        grid_params=grid_params,
+        random_params=random_params,
+        X_train=X_train,
+        y_train=y_train,
     )
-    logger.info(f"Grid search best estimator: {gs_best_estimator}")
 
-    # randomised search
-    logger.info("Randomised search tuning")
-    rs_best_estimator, _ = randomized_search_tuning(
-        best_model, random_params, X_train_prepared, y_train
-    )
-    logger.info(f"Randomised search best estimator: {rs_best_estimator}")
+    logger.info(f"The best hypertuned model is: {final_model}")
 
     # build model on test data and evaluate which is the best
     logger.info("Building models on test data")
     X_test, y_test = split_x_y_vars(test_set)
 
-    # transform X_test data and save the transformer
-    X_test_prepared, transform_pipeline = X_transformation_pipeline(X_test)
-
-    logger.info("Evaluating the best hypertuning method on the test data")
-
-    hpt_names = ["Grid Search", "Randomised Search"]
-    models = [gs_best_estimator, rs_best_estimator]
-
-    final_model, final_cv_rmse_score = model_evaluation_pipeline(
-        names=hpt_names, models=models, X=X_train_prepared, y=y_train
-    )
-    logger.info(f"The best hypertuned model is: {final_model}")
-
     logger.info("Building the final model")
-    final_pred = build_model(final_model, X_test_prepared, y_test)
+    final_pred = final_model.predict(X_test)
 
     final_rmse = calculate_rmse(y_test, final_pred)
     logger.info(f"Final RMSE: {final_rmse}")
@@ -101,9 +92,8 @@ def train(models: list[Any], names: list[str]) -> None:
     save(
         model=final_model,
         predictions=final_pred,
-        mean_cv_score=final_cv_rmse_score,
+        model_rmse=final_model_rmse,
         X=X_test,
-        X_transformer=transform_pipeline,
         y=y_test,
         file_name="points_prediction_model.pkl",
     )

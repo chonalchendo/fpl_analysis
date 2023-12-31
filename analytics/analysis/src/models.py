@@ -1,12 +1,14 @@
 import numpy as np
-from typing import Any
-from analysis.utilities.utils import get_logger
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.feature_selection import SelectFromModel
 from scipy import stats
+from analysis.utilities.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -58,28 +60,49 @@ def confidence_interval(
     )
 
 
-def build_model(
+def build_pipeline(
     regressor: LinearRegression | DecisionTreeRegressor | RandomForestRegressor,
+    preprocessor: ColumnTransformer,
+) -> Pipeline:
+    """Build the model and predict the points.
+
+    Args:
+        regressor (LinearRegression | DecisionTreeRegressor | RandomForestRegressor): regression model
+        preprocessor (ColumnTransformer): transformation pipeline
+
+    Returns:
+        Pipeline: Model pipeline
+    """
+    return Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            # ("feature_selection", SelectFromModel(regressor)),
+            ("regressor", regressor),
+        ]
+    )
+
+
+def build_model(
+    regressor: Pipeline,
     X: np.ndarray,
     y: np.ndarray,
 ) -> np.ndarray:
     """Build the model and predict the points.
 
     Args:
-        regressor (LinearRegression | DecisionTreeRegressor | RandomForestRegressor): regression model
+        regressor (Pipeline): regression model
         X (np.ndarray): explanatory variables
         y (np.ndarray): target variable
 
     Returns:
-        np.ndarray: _description_
+        np.ndarray: predicted points
     """
     regressor.fit(X, y)
-    points_predictions = regressor.predict(X)
-    return points_predictions
+    return regressor.predict(X)
 
 
 def evaluate_model(
-    regressor: LinearRegression | DecisionTreeRegressor | RandomForestRegressor,
+    regressor: Pipeline,
     X_train: np.ndarray,
     y_train: np.ndarray,
 ) -> np.ndarray:
@@ -87,43 +110,44 @@ def evaluate_model(
     model with the lowest RMSE is the best model.
 
     Args:
-        regressor (LinearRegression | DecisionTreeRegressor | RandomForestRegressor): regression model
+        regressor (Pipeline): regression model
         X_train (np.ndarray): X train variables
         y_train (np.ndarray): y train variable
 
     Returns:
         np.ndarray: mean RMSE
     """
-    scores = cross_val_score(
+    scores = -cross_val_score(
         regressor,
         X_train,
         y_train,
-        scoring="neg_mean_squared_error",
+        scoring="neg_root_mean_squared_error",
         cv=10,
     )
-    rmse_scores = np.sqrt(-scores)
-    display_scores(rmse_scores)
-    return rmse_scores.mean()
+    display_scores(scores)
+    return scores.mean()
 
 
 def model_evaluation_pipeline(
-    names: list[str], models: list[Any], X: np.ndarray, y: np.ndarray
-) -> tuple[Any, np.ndarray]:
-    """Pipeline that builds, evaluates and selects the best model.
+    model_pipelines: list[tuple[str, Pipeline]],
+    X: np.ndarray,
+    y: np.ndarray,
+) -> Pipeline:
+    """Pipeline that builds, evaluates and selects the best model pipeline.
 
     Args:
-        names (list[str]): name of models or hyper tuning methods
-        models (list[Any]): models or hyper tuning methods
+        model_pipelines (list[Any]): model pipelines
         X (np.ndarray): Explanatory variables
         y (np.ndarray): Target variable
 
     Returns:
-        Any: best model
+        Pipeline: best model pipeline
     """
-    model_scores = []
-    for name, model in zip(names, models):
+    model_scores: list[int] = []
+    for name, model in model_pipelines:
         logger.info(f"Evaluating {name}")
         points_prediction = build_model(model, X, y)
+        logger.info(f"Predicting points for {name}: {points_prediction}")
 
         logger.info(f"Calculating RMSE for {name}")
         calculate_rmse(y, points_prediction)
@@ -134,10 +158,9 @@ def model_evaluation_pipeline(
 
     smallest_rmse = min(model_scores)
     index_pos = model_scores.index(smallest_rmse)
-    model = models[index_pos]
-    name = names[index_pos]
+    model = model_pipelines[index_pos]
     logger.info(
-        f"The best method is: {name}\n The rmse score is: {model_scores[index_pos]}"
+        f"The best method is: {model[0]}\n The rmse score is: {model_scores[index_pos]}"
     )
 
-    return model, smallest_rmse
+    return model[1]

@@ -52,14 +52,14 @@ def split_x_y_vars(data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return X, y
 
 
-def X_transformation_pipeline(X: np.ndarray) -> np.ndarray:
+def X_transformation_pipeline(X: np.ndarray) -> ColumnTransformer:
     """Transformation pipeline for X train variables.
 
     Args:
         X (np.ndarray): explanatory variables
 
     Returns:
-        np.ndarray: transformed data
+        ColumnTransformer: transformation pipeline
     """
     # transformation pipeline
     num_pipeline = make_pipeline(StandardScaler())
@@ -80,4 +80,5 @@ def X_transformation_pipeline(X: np.ndarray) -> np.ndarray:
         ]
     )
 
-    return preprocess_pipeline.fit_transform(X), preprocess_pipeline
+    # return preprocess_pipeline.fit_transform(X), preprocess_pipeline
+    return preprocess_pipeline
