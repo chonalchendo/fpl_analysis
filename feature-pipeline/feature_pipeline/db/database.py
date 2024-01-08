@@ -1,5 +1,6 @@
 import psycopg2
 from sqlalchemy.engine import Connection, create_engine
+from sqlalchemy_utils.functions import database_exists
 from feature_pipeline.utilities.utils import get_logger
 from feature_pipeline.core.settings import SETTINGS
 
@@ -39,15 +40,21 @@ def create_db(database_name: str) -> None:
         logger.info("---- Connection closed ----")
 
 
-def create_database_connection() -> Connection:
+def create_database_connection(database: str) -> Connection:
     """Create connection to SQL database.
 
     Returns:
         Connection: Connection to SQL database.
     """
-    engine = create_engine(SETTINGS["SQLALCHEMY_DATABASE_URI"])
+    db = f'{SETTINGS["SQLALCHEMY_DATABASE_URI"]}/{database}'
+    if database_exists(db):
+        engine = create_engine(db)
+    else:
+        create_db(database)
+        engine = create_engine(db)
     return engine.connect()
 
 
-if __name__ == "__main__":
-    create_db("fantasy_premier_league")
+# if __name__ == "__main__":
+#     for db in ["transfermarkt", "fbref"]:
+#         create_db(db)

@@ -35,7 +35,7 @@ def get_root_dir(default_value: str = ".") -> Path:
 
 
 def get_root_path():
-    return Path(__file__).parent.parent
+    return Path(__file__).parent.parent.parent
 
 
 def get_source_path():
@@ -45,7 +45,7 @@ def get_source_path():
 ROOT = get_root_path()
 SOURCE = get_source_path()
 ML_PIPELINE_ROOT_DIR = get_root_dir()
-OUTPUT_DIR = ML_PIPELINE_ROOT_DIR / "output"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# OUTPUT_DIR = ML_PIPELINE_ROOT_DIR / "output"
+# OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 SETTINGS = load_env_vars(root_dir=ROOT)

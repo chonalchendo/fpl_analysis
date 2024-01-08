@@ -2,7 +2,7 @@ import httpx
 import pandas as pd
 from rich import print
 from httpx import Response
-from feature_pipeline.etl.validation import PlayerInfo
+from feature_pipeline.etl.fpl.src.validation import PlayerInfo
 from feature_pipeline.utilities.utils import get_logger
 
 BASE = "https://fantasy.premierleague.com/api"
