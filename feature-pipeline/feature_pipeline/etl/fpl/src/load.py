@@ -101,5 +101,5 @@ def to_sql_database(data: pd.DataFrame, table_name: str) -> None:
         data (pd.DataFrame): players data.
         table_name (str): name of table to load data into.
     """
-    conn = create_database_connection()
+    conn = create_database_connection(database="fantasy_premier_league")
     data.to_sql(table_name, conn, if_exists="replace")

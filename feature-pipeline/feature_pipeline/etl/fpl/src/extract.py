@@ -58,7 +58,7 @@ def from_file() -> tuple[pd.DataFrame, dict[str, str]]:
     Returns:
         pd.DataFrame: player dataframe
     """
-    path = f"{SOURCE}/data/raw/player_data.pkl"
+    path = f"{SOURCE}/data/fpl/player_data.pkl"
 
     df = pd.read_pickle(path)
 

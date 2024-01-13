@@ -39,7 +39,7 @@ def get_root_path():
 
 
 def get_source_path():
-    return Path(__file__).parent
+    return Path(__file__).parent.parent
 
 
 ROOT = get_root_path()

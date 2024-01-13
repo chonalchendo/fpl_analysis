@@ -1,5 +1,4 @@
 import requests
-import http.client
 from feature_pipeline.core.settings import SETTINGS
 from feature_pipeline.utilities.utils import get_logger
 
@@ -36,5 +35,5 @@ def alt_get_url_data(url: str) -> requests.models.Response:
         r = requests.get(SETTINGS["ZENSCRAPER_API"], headers=headers, params=params)
         logger.info(f"Request status: {r.status_code}")
         return r
-    except http.client.HTTPException as e:
+    except requests.exceptions.RequestException as e:
         logger.error(e)

@@ -85,13 +85,21 @@ def get_teams_data(url: str = "bootstrap-static") -> pd.DataFrame:
 
 
 def map_team_stats(col: str) -> dict[int, str]:
+    """Map team stats to team id.
+
+    Args:
+        col (str): column name.
+
+    Returns:
+        dict[int, str]: dictionary with team id as key and team stat as value.
+    """
     teams = get_teams_data()
     # return {k["id"]: k[col] for k in teams}
     return dict(zip(teams["id"], teams[col]))
 
 
-if __name__ == "__main__":
-    url = 'https://fbref.com/en/comps/Big5/gca/players/Big-5-European-Leagues-Stats#stats_gca'
-    df = pd.read_html(url)
+# if __name__ == "__main__":
+#     url = 'https://fbref.com/en/comps/Big5/gca/players/Big-5-European-Leagues-Stats#stats_gca'
+#     df = pd.read_html(url)
     
-    print(df)
+#     print(df)

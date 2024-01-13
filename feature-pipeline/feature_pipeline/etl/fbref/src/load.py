@@ -11,3 +11,5 @@ def to_sql_database(data: pd.DataFrame, table_name: str, database: str) -> None:
     """
     conn = create_database_connection(database)
     data.to_sql(table_name, conn, if_exists="replace")
+    
+    

@@ -2,6 +2,7 @@ from icecream import ic
 from feature_pipeline.etl.transfermarkt.src import extract, transform, load
 from feature_pipeline.apis.transfermarkt import competition_ids, competition_names
 from feature_pipeline.utilities.utils import get_logger
+from feature_pipeline.utilities.storage import gcp
 
 
 logger = get_logger(__name__)
@@ -9,7 +10,7 @@ logger = get_logger(__name__)
 
 def run_leagues_etl() -> None:
     """Extracts, transforms and loads league data from Transfermarkt"""
-    
+
     logger.info("Beginning transfermarkt leagues etl pipeline")
 
     for comp_id, comp_name in zip(competition_ids, competition_names):
@@ -28,12 +29,19 @@ def run_leagues_etl() -> None:
             data=df, table_name=f"{comp_name}_league_data", database="transfermarkt"
         )
 
-    logger.info("Finished")
+        logger.info(f"Saving league data for {comp_id} to GCP bucket")
+        gcp.write_blob_to_bucket(
+            bucket_name="transfermarkt_db",
+            blob_name=f"{comp_name}_team_data.csv",
+            data=df,
+        )
+
+    logger.info("Finished Transfermarkt leagues etl pipeline")
 
 
 def run_player_vals_etl() -> None:
     """Extracts, transforms and loads player valuations data from Transfermarkt"""
-    
+
     logger.info("Beginning transfermarkt player valuations etl pipeline")
 
     for league in competition_names:
@@ -55,9 +63,16 @@ def run_player_vals_etl() -> None:
             data=df, table_name=f"{league}_player_valuations", database="transfermarkt"
         )
 
-    logger.info("Finished")
+        logger.info(f"Saving player valuations data for {league} to GCP bucket")
+        gcp.write_blob_to_bucket(
+            bucket_name="transfermarkt_db",
+            blob_name=f"{league}_player_valuations.csv",
+            data=df,
+        )
+
+    logger.info("Finished Trnasfermarkt player valuations etl pipeline")
 
 
-if __name__ == "__main__":
-    run_leagues_etl()
-    run_player_vals_etl()
+# if __name__ == "__main__":
+#     run_leagues_etl()
+#     run_player_vals_etl()
