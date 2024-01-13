@@ -27,6 +27,13 @@ def prepare_data(data: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
         "gameweek",
         "season",
         "last_updated",
+        "opponent_strength_attack",
+        "opponent_strength_defence",
+        "opponent_strength_overall",
+        "transfers_balance",
+        "transfers_in",
+        "transfers_out",
+        "starts",
     ]
     data = data.drop(columns=columns_to_drop)
 
@@ -79,6 +86,4 @@ def X_transformation_pipeline(X: np.ndarray) -> ColumnTransformer:
             ("ord", ord_pipeline, ord_cols),
         ]
     )
-
-    # return preprocess_pipeline.fit_transform(X), preprocess_pipeline
     return preprocess_pipeline
