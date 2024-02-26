@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 
 @dataclass
-class Plots:
+class StatisticPlots:
     _data: pd.DataFrame
 
     def _export_plot(self, filename: str) -> None:
@@ -56,7 +56,14 @@ class Plots:
             ncols (int, optional): plot grid columns. Defaults to 4.
             save_to (str, optional): filename to save to. Defaults to None.
         """
+        # make sure y is not in X
+        X = [col for col in X if col != y]
+
         fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(15, 15))
+
+        # remove empty subplots
+        for i in range(len(X), len(axes.flatten())):
+            fig.delaxes(axes.flatten()[i])
 
         for stat, ax in zip(X, axes.flatten()):
             sns.scatterplot(
@@ -351,3 +358,91 @@ class PlayerValsPlots:
         plt.suptitle("Value for money signings by season")
         plt.tight_layout()
         plt.show()
+
+
+@dataclass  
+class TeamValsPlots:
+    _data: pd.DataFrame
+
+    def top_10_plot(self, column: str, ascend: bool = False) -> plt.Axes:
+        """Plot the top 10 values by column.
+
+        Args:
+            column (str): column to sort by
+            ascend (bool, optional): sort method. Defaults to False.
+
+        Returns:
+            plt.Axes: matplotlib axes
+        """
+        df = self._data.copy()
+        data = df.sort_values(by=column, ascending=ascend).head(10)
+
+        # plot the values
+        fig, ax = plt.subplots(figsize=(8, 6))
+        fig = sns.barplot(
+            data=data, y="team_season", x=column, ax=ax, color="royalblue"
+        )
+
+        if "value" in column:
+            ax.bar_label(
+                ax.containers[-1], fmt="€%.2fm", label_type="center", color="white"
+            )
+        elif "pct" in column:
+            ax.bar_label(
+                ax.containers[-1], fmt="%.2f%%", label_type="center", color="white"
+            )
+        elif "age" in column:
+            ax.bar_label(
+                ax.containers[-1], fmt="%.2f", label_type="center", color="white"
+            )
+        else:
+            ax.bar_label(
+                ax.containers[-1], fmt="%d", label_type="center", color="white"
+            )
+        return fig
+
+    def time_series_plot(self, column: str, seasons: int = 1) -> plt.Axes:
+        """Plot a time series of a column for teams that have appeared in a
+        certain number of seasons.
+
+        Args:
+            df (pd.DataFrame): dataframe to plot
+            column (str): column to plot
+            seasons (int, optional): season to filter. Defaults to 1.
+
+        Returns:
+            plt.Axes: matplotlib axes
+        """
+
+        # count season apps for each team
+        season_apps = PlayerValData().count_season_apps_df(self._data)
+
+        # teams that have appeared in every season
+        teams = season_apps[season_apps["appearances"] >= seasons]["teams"].values
+
+        # filter the data
+        data = self._data[self._data["team"].isin(teams)]
+
+        # plot the data
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        fig = sns.lineplot(
+            data,
+            x="season",
+            y=column,
+            hue="team",
+            style="team",
+            ax=ax,
+            palette="tab10",
+            markers=True,
+        )
+
+        title = column.split("_")[0].capitalize()
+
+        plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
+        plt.xlabel("Season")
+        plt.ylabel(f"{title} Squad Value (€m)")
+        plt.title(
+            f"{title} squad value over time for teams that have appeared in {seasons} seasons or more"
+        )
+        return fig
