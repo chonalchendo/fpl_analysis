@@ -297,15 +297,17 @@ class PlayerValData:
 class TeamValues:
     _data: pd.DataFrame
 
-    def create_team_season_col(self) -> None:
+    def create_team_season_col(self) -> pd.DataFrame:
         self._data.loc[:, "team_season"] = (
             self._data["team"] + " - " + self._data["season"].astype(str)
         )
+        return self._data
 
-    def create_foreign_pct_col(self) -> None:
+    def create_foreign_pct_col(self) -> pd.DataFrame:
         self._data.loc[:, "foreigner_pct"] = round(
             (self._data["squad_foreigners"] / self._data["squad_size"]) * 100, 2
         )
+        return self._data
 
     def pipeline(self) -> pd.DataFrame:
         self.create_team_season_col()
