@@ -42,3 +42,29 @@ class StatsData:
         )
         countries = mins_played.index[:10].tolist()
         return data[data["country"].isin(countries)]
+
+    def top_10_per_position(
+        self,
+        value: str,
+        position: str = "Defender",
+        ascending: bool = False,
+    ) -> pd.DataFrame:
+        """Create dataframe of top 10 players per position for a given metric.
+
+        Args:
+            value (str): metric to rank by e.g. 'npxG', 'npxG_per90'.
+            position (str, optional): player position. Defaults to "Defender".
+            ascending (bool, optional): ascend or decend. Defaults to False.
+
+        Returns:
+            pd.DataFrame: dataframe of top 10 players per position for a given metric
+        """
+        data = (
+            self._data.loc[self._data["general_pos"] == position][["season", "player", value]]
+            .sort_values(value, ascending=ascending)
+            .reset_index(drop=True)
+            .head(10)
+        )
+
+        data.loc[:, "player_season"] = data["player"] + " - " + data["season"]
+        return data
