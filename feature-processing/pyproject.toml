@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "feature-processing"
+version = "0.1.0"
+description = "Process football data for analysis"
+authors = ["chonalchendo <110059232+chonalchendo@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.2.1"
+joblib = "^1.3.2"
+google-cloud-storage = "^2.15.0"
+rich = "^13.7.1"
+python-dotenv = "^1.0.1"
+pycountry-convert = "^0.7.2"
+pycountry = "^23.12.11"
+beautifulsoup4 = "^4.12.3"
+lxml = "^5.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
