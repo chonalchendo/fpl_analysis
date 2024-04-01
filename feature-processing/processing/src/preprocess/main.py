@@ -3,7 +3,7 @@ from typing import Literal
 from processing.src.preprocess.fbref import Clean as FbrefClean
 from processing.src.preprocess.transfermarkt import CleanTeam, CleanPlayer
 from processing.src.preprocess.utils import generate_unique_id
-from processing.utilities.utils import get_logger
+from processing.utilities.logger import get_logger
 from processing.gcp.storage import gcp
 
 logger = get_logger(__name__)

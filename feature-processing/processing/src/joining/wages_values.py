@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from rich import print
 
 from processing.gcp.storage import gcp
-from processing.utilities.utils import get_logger
+from processing.utilities.logger import get_logger
 
 logger = get_logger(__name__)
 

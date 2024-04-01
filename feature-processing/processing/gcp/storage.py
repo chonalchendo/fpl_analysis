@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 import pandas as pd
 import joblib
-from processing.utilities.utils import get_logger
+from processing.utilities.logger import get_logger
 from processing.core.settings import SETTINGS
 
 
