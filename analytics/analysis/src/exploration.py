@@ -68,7 +68,7 @@ def join_multiple_dfs(dfs: list[pd.DataFrame], how: str, on: str) -> pd.DataFram
     return reduce(lambda left, right: pd.merge(left, right, how=how, on=on), dfs)
 
 
-def calculate_stats(groupby: str, stat: str, df: pd.DataFrame = df) -> pd.DataFrame:
+def calculate_stats(groupby: str, stat: str, df: pd.DataFrame) -> pd.DataFrame:
     """Calculate stats for a given groupby and stat.
 
     Args:

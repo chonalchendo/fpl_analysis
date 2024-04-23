@@ -38,12 +38,10 @@ def get_root_path():
     return Path(__file__).parent.parent.parent
 
 
-
-
 ROOT = get_root_path()
 ML_PIPELINE_ROOT_DIR = get_root_dir()
-OUTPUT_DIR = ML_PIPELINE_ROOT_DIR / "output"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# OUTPUT_DIR = ML_PIPELINE_ROOT_DIR / "output"
+# OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 SETTINGS = load_env_vars(root_dir=ROOT)
 MODELS = f"{ROOT}/analysis/models"
