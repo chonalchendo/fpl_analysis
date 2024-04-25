@@ -32,11 +32,13 @@ def validation(
         float: scoring metric
     """
     clone_model = clone(pipeline["model"])
+
+    logger.info("splitting data")
     X_train_folds = X.iloc[train_index]
     y_train_folds = y.iloc[train_index]
     X_test_fold = X.iloc[test_index]
     y_test_fold = y.iloc[test_index]
-    
+
     logger.info("cleaning training data")
     # clean train data
     y_train_folds = pipeline["target"].fit_transform(
@@ -53,17 +55,16 @@ def validation(
     )
     X_test_fold = pipeline["preprocess"].fit_transform(X_test_fold, y_test_fold.ravel())
 
-    print(X_test_fold.shape)
-    print(X_train_folds.shape)
-    
     logger.info("fitting model")
     clone_model.fit(X_train_folds, y_train_folds.ravel())
 
+    logger.info("predicting")
     y_pred = clone_model.predict(X_test_fold)
 
     y_pred = np.expm1(y_pred)
     y_test_fold = np.expm1(y_test_fold)
 
+    logger.info("scoring")
     return model_score(y_test_fold, y_pred, scoring)
 
 
@@ -81,13 +82,15 @@ def cross_validate(
         X (pd.DataFrame): independent variables
         y (pd.Series): dependent variable
         cv (Any): cross validation method
-        scoring (Literal[&quot;mae&quot;, &quot;rmse&quot;, &quot;r2&quot;]): 
+        scoring (Literal[&quot;mae&quot;, &quot;rmse&quot;, &quot;r2&quot;]):
         scoring metric
 
     Returns:
         list[float]: list of cross validation scores
     """
-    return [
+    logger.info(f"cross validating model: {pipeline['model']}")
+    
+    scores = [
         validation(
             pipeline=pipeline,
             X=X,
@@ -98,3 +101,7 @@ def cross_validate(
         )
         for train_index, test_index in cv.split(X, y)
     ]
+    
+    logger.info(f"\nscores: {scores}")
+    
+    return scores 
