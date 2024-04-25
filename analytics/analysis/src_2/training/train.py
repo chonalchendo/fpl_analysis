@@ -37,7 +37,7 @@ def train() -> None:
         X=X_train,
         y=y_train,
         cv=KFold(n_splits=5, shuffle=True, random_state=42),
-        scoring="rmse",
+        scoring="mae",
     )
 
     print(train.get_scores)

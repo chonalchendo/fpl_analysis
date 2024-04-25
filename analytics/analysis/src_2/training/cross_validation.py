@@ -6,6 +6,7 @@ from sklearn.pipeline import Pipeline
 
 from analysis.utilities.utils import get_logger
 from analysis.src_2.utils.metrics import model_score
+from analysis.src_2.utils.model_metadata import model_metadata
 
 logger = get_logger(__name__)
 
@@ -74,7 +75,7 @@ def cross_validate(
     y: pd.Series,
     cv: Any,
     scoring: Literal["mae", "rmse", "r2"],
-) -> list[float]:
+) -> dict[str, Any]:
     """cross validation function
 
     Args:
@@ -86,10 +87,10 @@ def cross_validate(
         scoring metric
 
     Returns:
-        list[float]: list of cross validation scores
+        dict[str, Any]: model meta data
     """
     logger.info(f"cross validating model: {pipeline['model']}")
-    
+
     scores = [
         validation(
             pipeline=pipeline,
@@ -101,7 +102,20 @@ def cross_validate(
         )
         for train_index, test_index in cv.split(X, y)
     ]
-    
-    logger.info(f"\nscores: {scores}")
-    
-    return scores 
+
+    metadata = model_metadata(
+        model=pipeline["model"],
+        model_params=pipeline["model"].get_params(),
+        preprocess_steps=pipeline["preprocess"],
+        target_steps=pipeline["target"],
+        metric=scoring,
+        scores=scores,
+        mean_scores=np.mean(scores),
+        std_scores=np.std(scores),
+        X_data=X,
+        y_data=y,
+    )
+
+    logger.info(metadata)
+
+    return metadata
