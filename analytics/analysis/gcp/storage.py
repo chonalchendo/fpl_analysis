@@ -91,6 +91,24 @@ class GCP:
 
         with blob.open("rb") as f:
             return pd.read_csv(f)
+        
+    def write_df_to_bucket(
+        self, data: pd.DataFrame, bucket_name: str, blob_name: str
+    ) -> None:
+        """Writes a file to the bucket.
+
+        Args:
+            bucket_name (str): name of bucket
+            blob_name (str): name of new blob
+            data (pd.DataFrame): dataframe to write to blob
+        """
+        bucket = self.get_gcp_bucket(bucket_name)
+
+        logger.info(f"Creating blob: {blob_name}")
+        blob = bucket.blob(blob_name)
+
+        logger.info(f"Uploading dataframe to {blob_name} as a .csv file")
+        blob.upload_from_string(data.to_csv(index=False), "text/csv")
 
 
 gcp = GCP()

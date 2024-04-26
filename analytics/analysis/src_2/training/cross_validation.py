@@ -110,12 +110,14 @@ def cross_validate(
         target_steps=pipeline["target"],
         metric=scoring,
         scores=scores,
-        mean_scores=np.mean(scores),
-        std_scores=np.std(scores),
+        mean_score=np.mean(scores),
+        std_score=np.std(scores),
         X_data=X,
         y_data=y,
     )
 
-    logger.info(metadata)
+    logger.info(
+        f"\ncross validation scores: {scores}, \nmean: {metadata['mean_score']}, \nstd: {metadata['std_score']}"
+    )
 
     return metadata
