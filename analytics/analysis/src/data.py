@@ -3,7 +3,7 @@ import sqlalchemy
 from sqlalchemy import Connection
 
 from analysis.core.settings import SETTINGS
-from analysis.utilities.utils import get_logger
+from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)
 

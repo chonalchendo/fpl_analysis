@@ -1,7 +1,7 @@
 from sklearn.model_selection import KFold
 
 from analysis.gcp.storage import gcp
-from analysis.utilities.utils import get_logger
+from analysis.utilities.logging import get_logger
 from analysis.src_2.utils.data_splitter import train_valid_test_split
 from analysis.src_2.training.model_trainer import ModelTrainer
 from analysis.src_2.training.models import models
@@ -35,9 +35,8 @@ def train() -> None:
         y=y_train,
         cv=KFold(n_splits=5, shuffle=True, random_state=42),
         scoring="mae",
+        store=True,
     )
-
-    # print(train.get_scores)
 
 
 if __name__ == "__main__":

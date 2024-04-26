@@ -14,7 +14,7 @@ from analysis.src.models import (
     build_pipeline,
 )
 from analysis.src.data import db
-from analysis.utilities.utils import get_logger
+from analysis.utilities.logging import get_logger
 from analysis.models.model_manager import save
 from analysis.models.hyperparamter_config import grid_params, random_params
 from analysis.src.hyperparameter_tuning import (

@@ -2,7 +2,7 @@ from typing import Any
 import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
-from analysis.utilities.utils import get_logger
+from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)
 

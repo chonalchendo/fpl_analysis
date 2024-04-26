@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.feature_selection import SelectFromModel
 from scipy import stats
-from analysis.utilities.utils import get_logger
+from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)
 

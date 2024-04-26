@@ -17,7 +17,7 @@ def model_metadata(
     std_score: float,
     X_data: pd.DataFrame,
     y_data: pd.DataFrame,
-    date: dt.datetime = dt.datetime.now().strftime("%Y-%m-%d"),
+    date: dt.datetime = dt.datetime.now(),
 ) -> dict[str, Any]:
     """Create a dictionary containing the model metadata.
 

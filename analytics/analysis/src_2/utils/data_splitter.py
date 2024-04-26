@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from analysis.gcp.storage import gcp
-from analysis.utilities.utils import get_logger
+from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)
 
