@@ -33,20 +33,21 @@ class Models:
                     self.br,
                     self.hgb,
                 ],
-                final_estimator=self.xgb,
+                final_estimator=self.xgb[1],
                 n_jobs=-1,
             ),
         )
 
+    @property
     def get_models(self) -> list[tuple[str, RegressorMixin]]:
         return [
             self.ridge,
-            self.rf,
-            self.gbr,
             self.xgb,
-            self.abr,
-            self.kr,
-            self.br,
-            self.hgb,
-            self.stacked,
+            # self.rf,
+            # self.gbr,
+            # self.abr,
+            # self.kr,
+            # self.br,
+            # self.hgb,
+            # self.stacked,
         ]

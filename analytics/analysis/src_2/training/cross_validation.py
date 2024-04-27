@@ -32,7 +32,7 @@ def validation(
     Returns:
         float: scoring metric
     """
-    clone_model = clone(pipeline["model"])
+    clone_model = clone(pipeline[2])
 
     logger.info("splitting data")
     X_train_folds = X.iloc[train_index]
@@ -89,7 +89,7 @@ def cross_validate(
     Returns:
         dict[str, Any]: model meta data
     """
-    logger.info(f"cross validating model: {pipeline['model']}")
+    logger.info(f"cross validating model: {pipeline[2]}")
 
     scores = [
         validation(
@@ -103,9 +103,12 @@ def cross_validate(
         for train_index, test_index in cv.split(X, y)
     ]
 
+    model_name = list(pipeline.named_steps.items())[2][0]
+
     metadata = model_metadata(
-        model=pipeline["model"],
-        model_params=pipeline["model"].get_params(),
+        model_name=model_name,
+        model=pipeline[2],
+        model_params=pipeline[2].get_params(),
         preprocess_steps=pipeline["preprocess"],
         target_steps=pipeline["target"],
         metric=scoring,

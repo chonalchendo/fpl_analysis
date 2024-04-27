@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 
 
 def model_metadata(
+    model_name: str, 
     model: RegressorMixin,
     model_params: dict,
     preprocess_steps: Pipeline,
@@ -38,6 +39,7 @@ def model_metadata(
         dict[str, Any]: model metadata
     """
     return {
+        'model_name': model_name,
         "model": model,
         "model_params": model_params,
         "preprocess": preprocess_steps,

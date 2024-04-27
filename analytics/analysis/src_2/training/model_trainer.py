@@ -1,29 +1,25 @@
 from typing import Literal, Any
 import pandas as pd
 from sklearn.base import RegressorMixin
+from sklearn.pipeline import Pipeline
 
 from analysis.gcp.storage import gcp
-from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder
 from analysis.src_2.training.cross_validation import cross_validate
+from analysis.src_2.prediction.weights import calculate_weights
 
 
-class ModelTrainer(PipelineBuilder):
+class ModelTrainer:
     """Class that is used to train models scikit-learn regression models.
 
     Args:
-        PipelineBuilder: Custom class that builds a scikit-learn pipeline for data preprocessing
         models (list[str, RegressorMixin]): list of model names and scikit-learn models
-        drop_features (list[str]): list of features to drop
-        target_encode_features (list[str]): list of features to target encode
     """
+
     def __init__(
         self,
-        models: list[str, RegressorMixin],
-        drop_features: list[str],
-        target_encode_features: list[str],
+        pipelines: list[Pipeline],
     ) -> None:
-        super().__init__(drop_features, target_encode_features)
-        self.models = models
+        self.pipelines = pipelines
         self.num_features = []
         self.cat_features = []
 
@@ -44,18 +40,15 @@ class ModelTrainer(PipelineBuilder):
             scoring (Literal[&quot;rmse&quot;, &quot;mae&quot;, &quot;r2&quot;]): evaluation metric
             store (bool, optional): store models in google cloud bucket. Defaults to False.
         """
-        self._cat_features(X)
-        self._num_features(X)
 
         self.metadata = [
-            {name: self._cross_validate_model(name, model, X, y, cv, scoring, store)}
-            for name, model in self.models
+            self._cross_validate_model(pipeline, X, y, cv, scoring, store)
+            for pipeline in self.pipelines
         ]
 
     def _cross_validate_model(
         self,
-        name: str,
-        model: Any,
+        pipeline: Pipeline,
         X: pd.DataFrame,
         y: pd.DataFrame,
         cv: Any,
@@ -71,23 +64,25 @@ class ModelTrainer(PipelineBuilder):
             y (pd.DataFrame): y data
             cv (Any): cross-validation strategy
             scoring (Literal[&quot;rmse&quot;, &quot;mae&quot;, &quot;r2&quot;]): evaluation metric
-            store (bool, optional): store model in GCP bucket. Defaults to False. 
+            store (bool, optional): store model in GCP bucket. Defaults to False.
 
         Returns:
-            dict: _description_
+            dict: model metadata
         """
         metadata = cross_validate(
-            pipeline=self.build(model=model),
+            pipeline=pipeline,
             X=X,
             y=y,
             cv=cv,
             scoring=scoring,
         )
 
+        model_name = list(pipeline.named_steps.items())[2][0]
+
         if store:
             gcp.write_model_to_bucket(
                 bucket_name="values_trained_models",
-                blob_name=f"{name}_model.pkl",
+                blob_name=f"{model_name}_model.pkl",
                 model=metadata,
             )
 
@@ -96,3 +91,20 @@ class ModelTrainer(PipelineBuilder):
     @property
     def get_metadata(self) -> list[dict[str, Any]]:
         return self.metadata
+
+    @property
+    def get_model_names(self) -> list[str]:
+        return [model["model_name"] for model in self.metadata]
+
+    @property
+    def get_models(self) -> list[RegressorMixin]:
+        return [model["model"] for model in self.metadata]
+
+    @property
+    def get_mean_scores(self) -> list[float]:
+        return [model["mean_score"] for model in self.metadata]
+
+    @property
+    def performance_weights(self) -> list[float]:
+        mean_scores = [model["mean_score"] for model in self.metadata]
+        return calculate_weights(mean_scores)

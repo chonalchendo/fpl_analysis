@@ -6,6 +6,7 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
 from sklearn.impute import SimpleImputer
 
+from analysis.src_2.training.features import drop_features, target_encode_features
 from analysis.src_2.preprocessing.transformers.drop_features import DropFeatures
 from analysis.src_2.preprocessing.pipeline.process import (
     signed_from_impute,
@@ -23,12 +24,12 @@ from analysis.src_2.preprocessing.pipeline.transform import (
     year_since_signed_feat,
 )
 
-    
+
 class PipelineBuilder:
     def __init__(
         self,
-        drop_features: list[str],
-        target_encode_features: list[str],
+        drop_features: list[str] = drop_features,
+        target_encode_features: list[str] = target_encode_features,
     ) -> None:
         self.drop_features = drop_features
         self.target_encode_features = target_encode_features
@@ -86,7 +87,11 @@ class PipelineBuilder:
             StandardScaler(),
         )
 
-    def build(self, model: RegressorMixin) -> Pipeline:
+    def build(self, X: pd.DataFrame, model: tuple[str, RegressorMixin]) -> Pipeline:
+        
+        self._cat_features(X)
+        self._num_features(X)
+        
         preprocessor = Pipeline(
             [
                 ("cleaner", self._preprocessor()),
@@ -96,10 +101,6 @@ class PipelineBuilder:
         )
 
         return Pipeline(
-            [
-                ("preprocess", preprocessor),
-                ("target", self._y_transformer()),
-                ("model", model),
-            ],
+            [("preprocess", preprocessor), ("target", self._y_transformer()), model],
             verbose=True,
         )
