@@ -4,7 +4,7 @@ from analysis.gcp.storage import gcp
 from analysis.utilities.logging import get_logger
 from analysis.src_2.utils.data_splitter import train_valid_test_split
 from analysis.src_2.training.model_trainer import ModelTrainer
-from analysis.src_2.training.models import models
+from analysis.src_2.training.models import Models
 from analysis.src_2.training.features import drop_features, target_encode_features
 
 
@@ -25,7 +25,7 @@ def train() -> None:
     )
 
     train = ModelTrainer(
-        models=models,
+        models=Models().get_models(),
         drop_features=drop_features,
         target_encode_features=target_encode_features,
     )
@@ -35,7 +35,7 @@ def train() -> None:
         y=y_train,
         cv=KFold(n_splits=5, shuffle=True, random_state=42),
         scoring="mae",
-        store=True,
+        store=False,
     )
 
 
