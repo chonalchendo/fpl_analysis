@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 from analysis.utilities.logging import get_logger
 from analysis.src_2.utils.metrics import model_score
 from analysis.src_2.utils.model_metadata import model_metadata
+from analysis.src_2.prediction.mean_pred import average_arrays
 
 logger = get_logger(__name__)
 
@@ -64,9 +65,11 @@ def validation(
 
     y_pred = np.expm1(y_pred)
     y_test_fold = np.expm1(y_test_fold)
+    
+    print(y_pred) 
 
     logger.info("scoring")
-    return model_score(y_test_fold, y_pred, scoring)
+    return model_score(y_test_fold, y_pred, scoring), y_pred
 
 
 def cross_validate(
@@ -104,6 +107,9 @@ def cross_validate(
     ]
 
     model_name = list(pipeline.named_steps.items())[2][0]
+    
+    mae_scores = [score[0] for score in scores]
+    y_preds = [score[1] for score in scores]
 
     metadata = model_metadata(
         model_name=model_name,
@@ -112,9 +118,9 @@ def cross_validate(
         preprocess_steps=pipeline["preprocess"],
         target_steps=pipeline["target"],
         metric=scoring,
-        scores=scores,
-        mean_score=np.mean(scores),
-        std_score=np.std(scores),
+        scores=mae_scores,
+        mean_score=np.mean(mae_scores),
+        std_score=np.std(mae_scores),
         X_data=X,
         y_data=y,
     )

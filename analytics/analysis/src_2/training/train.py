@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.model_selection import KFold
 
 from analysis.gcp.storage import gcp
@@ -7,6 +8,7 @@ from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder
 from analysis.src_2.training.model_trainer import ModelTrainer
 from analysis.src_2.models.regressors import Models
 from analysis.src_2.models.blend import BlendedRegressor
+from analysis.src_2.utils.metrics import model_score
 
 
 logger = get_logger(__name__)
@@ -28,9 +30,7 @@ def train() -> None:
     pipe = PipelineBuilder()
     models = [pipe.build(X_train, model) for model in Models().get_models]
 
-    train = ModelTrainer(
-        pipelines=models,
-    )
+    train = ModelTrainer(pipelines=models)
 
     train.train(
         X=X_train,
@@ -44,13 +44,28 @@ def train() -> None:
     print(train.get_mean_scores)
     print(train.performance_weights)
 
-    # blended = BlendedRegressor(
-    #     models=train.get_models, weights=train.performance_weights
-    # )
+    print("blending")
+    blend_reg = (
+        "blend",
+        BlendedRegressor(models=Models().get_models, weights=train.performance_weights),
+    )
 
-    # blended.fit(X_train, y_train)
-
-    # print(blended.predict(X_train))
+    blend_pipeline = pipe.build(X_train, blend_reg)
+    y_train_blend = blend_pipeline["target"].fit_transform(
+        y_train.to_numpy().reshape(-1, 1)
+    )
+    X_train_blend = blend_pipeline["preprocess"].fit_transform(
+        X_train, y_train_blend.ravel()
+    )
+    
+    
+    blend = BlendedRegressor(models=Models().get_models, weights=train.performance_weights)
+    y_pred = blend.fit_predict(X_train_blend, y_train_blend.ravel())
+    
+    y_pred = np.expm1(y_pred)
+    y = np.expm1(y_train_blend)
+    
+    print(model_score(y.ravel(), y_pred, "mae"))
 
 
 if __name__ == "__main__":
