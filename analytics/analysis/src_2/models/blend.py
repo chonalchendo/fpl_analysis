@@ -1,3 +1,4 @@
+from typing import Callable
 import pandas as pd
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_X_y
@@ -13,15 +14,22 @@ class BlendedRegressor:
     predictions and prevent overfitting.
 
     Args:
-        models (list[tuple[float, RegressorMixin]]): List models to blend together.
+        models (list[tuple[float, RegressorMixin]]): List models to blend 
+        together.
         weights (list[float]): List of weights to assign to each model.
+        inverse_func (Callable | None): Function transformer to apply to the 
+        predictions. Defaults to None.
     """
 
     def __init__(
-        self, models: list[tuple[str, RegressorMixin]], weights: list[float]
+        self,
+        models: list[tuple[str, RegressorMixin]],
+        weights: list[float],
+        inverse_func: Callable | None = None,
     ) -> None:
         self.models = models
         self.weights = weights
+        self.inverse_func = inverse_func
         self.fitted_models = []
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> "BlendedRegressor":
@@ -36,8 +44,9 @@ class BlendedRegressor:
         predictions = 0
         for weight, model in zip(self.weights, self.fitted_models):
             predictions += weight * model.predict(X)
+        
+        if self.inverse_func:
+            predictions = self.inverse_func(predictions)
+            
         return predictions
 
-    def fit_predict(self, X: pd.DataFrame, y: pd.Series) -> float:
-        self.fit(X, y)
-        return self.predict(X)
