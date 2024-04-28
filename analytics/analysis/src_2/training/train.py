@@ -50,7 +50,7 @@ def train() -> None:
         inverse_func=np.expm1,
     )
     
-    print(blended_pred)
+    logger.info(blended_pred)
 
 
 if __name__ == "__main__":

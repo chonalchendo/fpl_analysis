@@ -43,11 +43,11 @@ class Models:
         return [
             self.ridge,
             self.xgb,
-            # self.rf,
-            # self.gbr,
-            # self.abr,
-            # self.kr,
-            # self.br,
-            # self.hgb,
-            # self.stacked,
+            self.rf,
+            self.gbr,
+            self.hgb,
+            self.abr,
+            self.kr,
+            self.br,
+            self.stacked,
         ]
