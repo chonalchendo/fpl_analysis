@@ -14,10 +14,10 @@ class BlendedRegressor:
     predictions and prevent overfitting.
 
     Args:
-        models (list[tuple[float, RegressorMixin]]): List models to blend 
+        models (list[tuple[float, RegressorMixin]]): List models to blend
         together.
         weights (list[float]): List of weights to assign to each model.
-        inverse_func (Callable | None): Function transformer to apply to the 
+        inverse_func (Callable | None): Function transformer to apply to the
         predictions. Defaults to None.
     """
 
@@ -41,12 +41,15 @@ class BlendedRegressor:
         return self
 
     def predict(self, X: pd.DataFrame) -> float:
-        predictions = 0
-        for weight, model in zip(self.weights, self.fitted_models):
-            predictions += weight * model.predict(X)
-        
+        # predictions = 0
+        # for weight, model in zip(self.weights, self.fitted_models):
+        #     predictions += weight * model.predict(X)
+        predictions = sum(
+            weight * model.predict(X)
+            for weight, model in zip(self.weights, self.fitted_models)
+        )
+
         if self.inverse_func:
             predictions = self.inverse_func(predictions)
-            
-        return predictions
 
+        return predictions
