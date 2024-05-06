@@ -41,7 +41,7 @@ year_since_signed_feat = ApplyFunction(
 num_transformer = make_pipeline(StandardScaler())
 
 cat_transformer = make_pipeline(
-    SimpleImputer(strategy="constant", fill_value="most_frequent"),
+    SimpleImputer(strategy="most_frequent"),
     OneHotEncoder(sparse_output=False),
 )
 

@@ -34,21 +34,17 @@ class BlendedRegressor:
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> "BlendedRegressor":
         X, y = check_X_y(X, y)
-        for _, model in self.models:
+        for model in self.models:
             clone_model = clone(model)
             clone_model.fit(X, y)
             self.fitted_models.append(clone_model)
         return self
 
     def predict(self, X: pd.DataFrame) -> float:
-        # predictions = 0
-        # for weight, model in zip(self.weights, self.fitted_models):
-        #     predictions += weight * model.predict(X)
         predictions = sum(
             weight * model.predict(X)
             for weight, model in zip(self.weights, self.fitted_models)
         )
-
         if self.inverse_func:
             predictions = self.inverse_func(predictions)
 

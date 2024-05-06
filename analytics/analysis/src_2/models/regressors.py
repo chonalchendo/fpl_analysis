@@ -20,7 +20,24 @@ class Models:
         self.kr = ("kr", KernelRidge())
         self.br = ("br", BayesianRidge())
         self.hgb = ("hgb", HistGradientBoostingRegressor(random_state=42))
-        self.stacked = (
+
+    @property
+    def get_models(self) -> list[tuple[str, RegressorMixin]]:
+        models = [
+            # self.ridge,
+            self.xgb,
+            self.rf,
+            self.gbr,
+            self.hgb,
+            # self.abr,
+            # self.kr,
+            # self.br,
+        ]
+        return sorted(models, key=lambda x: x[0])
+
+    @property
+    def get_stacked(self) -> tuple[str, RegressorMixin]:
+        return (
             "stacked",
             StackingRegressor(
                 [
@@ -37,17 +54,3 @@ class Models:
                 n_jobs=-1,
             ),
         )
-
-    @property
-    def get_models(self) -> list[tuple[str, RegressorMixin]]:
-        return [
-            self.ridge,
-            self.xgb,
-            self.rf,
-            self.gbr,
-            self.hgb,
-            self.abr,
-            self.kr,
-            self.br,
-            self.stacked,
-        ]
