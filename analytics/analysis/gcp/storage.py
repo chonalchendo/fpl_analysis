@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Any
 import pandas as pd
 import joblib
-import pickle
 from analysis.utilities.logging import get_logger
 from analysis.core.settings import SETTINGS
 
@@ -71,7 +70,6 @@ class GCP:
             return None
 
         with blob.open("rb") as f:
-            # return pd.read_pickle(f)
             return joblib.load(f)
 
     def read_df_from_bucket(
