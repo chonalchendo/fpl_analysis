@@ -1,4 +1,5 @@
 from typing import Literal
+import xdrlib
 import pandas as pd
 import numpy as np
 from sklearn import clone
@@ -10,6 +11,8 @@ from analysis.src_2.prediction.weights import calculate_weights
 from analysis.utilities.logging import get_logger
 from analysis.src_2.utils.metrics import model_score
 from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder
+from analysis.gcp.storage import gcp
+from analysis.src_2.utils.model_metadata import model_metadata
 
 
 logger = get_logger(__name__)
@@ -40,6 +43,7 @@ class ModelValidator:
         n_iter: int = 10,
         X_valid: pd.DataFrame | None = None,
         y_valid: pd.Series | np.ndarray | None = None,
+        store: bool = False,
     ) -> list[str, dict]:
         return [
             {
@@ -53,6 +57,7 @@ class ModelValidator:
                     n_iter=n_iter,
                     X_valid=X_valid,
                     y_valid=y_valid,
+                    store=store
                 )
             }
             for pipeline, param in self._pipeline(X)
@@ -109,14 +114,17 @@ class ModelValidator:
         n_iter: int = 10,
         X_valid: pd.DataFrame | None = None,
         y_valid: pd.Series | np.ndarray | None = None,
+        store: bool = False,
     ) -> dict:
 
         if not isinstance(y, np.ndarray):
             y = y.to_numpy().reshape(-1, 1)
 
         model, X_, y_ = self._preprocess(pipeline, X, y)
-
-        logger.info(f"tuning {list(pipeline.named_steps.keys())[2]}")
+        
+        model_name = list(pipeline.named_steps.keys())[2]
+        logger.info(f"tuning {model_name}")
+        
         best_model, _ = self._random_tune(model, param, X_, y_, cv, scoring, n_iter)
         self.tuned_models.append(best_model)
         y_pred = best_model.predict(X_)
@@ -147,11 +155,32 @@ class ModelValidator:
                 "valid_score": valid_score,
             }
             logger.info(f"Tuning scores: {scores}")
-            return scores
+        else:
+            scores = {"train_score": model_score(y_, y_pred, scoring)}
+            logger.info(f"Tuning scores: {scores}")
+            
+        metadata = model_metadata(
+            model_name=model_name,
+            model=best_model,
+            model_params=best_model.get_params(),
+            preprocess_steps=pipeline["preprocess"],
+            target_steps=pipeline["target"],
+            metric=scoring,
+            scores=scores,
+            X_data=X,
+            y_data=y,
+            X_test=X_valid,
+            y_test=y_valid,
+        )
+            
+        if store:
+            gcp.write_model_to_bucket(
+                bucket_name="values_tuned_models",
+                blob_name=f"{model_name}_model.pkl",
+                model=metadata,
+            )
 
-        scores = {"train_score": model_score(y_, y_pred, scoring)}
-        logger.info(f"Tuning scores: {scores}")
-        return scores
+        return metadata
 
     @property
     def tuned_models(self) -> list[RegressorMixin]:

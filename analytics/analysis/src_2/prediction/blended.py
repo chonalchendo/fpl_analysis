@@ -1,6 +1,6 @@
 from typing import Callable, Literal
 import pandas as pd
-from sklearn.base import RegressorMixin, clone
+from sklearn.base import RegressorMixin
 
 from analysis.src_2.models.blend import BlendedRegressor
 from analysis.src_2.utils.metrics import model_score

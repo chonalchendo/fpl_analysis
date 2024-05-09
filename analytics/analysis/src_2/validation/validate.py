@@ -47,6 +47,7 @@ def validate() -> None:
         cv=5,
         scoring="neg_mean_absolute_error",
         n_iter=10,
+        store=True,
     )
 
     logger.info(scores)

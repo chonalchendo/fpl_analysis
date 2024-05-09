@@ -13,11 +13,13 @@ def model_metadata(
     preprocess_steps: Pipeline,
     target_steps: Pipeline,
     metric: str,
-    scores: list[float],
-    mean_score: float,
-    std_score: float,
     X_data: pd.DataFrame,
     y_data: pd.DataFrame,
+    scores: list[float],
+    mean_score: float | None = None,
+    std_score: float | None = None,
+    X_test: pd.DataFrame | None = None,
+    y_test: pd.DataFrame | None = None,
     date: dt.datetime = dt.datetime.now(),
 ) -> dict[str, Any]:
     """Create a dictionary containing the model metadata.
@@ -38,7 +40,7 @@ def model_metadata(
     Returns:
         dict[str, Any]: model metadata
     """
-    return {
+    metadata = {
         'model_name': model_name,
         "model": model,
         "model_params": model_params,
@@ -46,9 +48,19 @@ def model_metadata(
         "target": target_steps,
         "metric": metric,
         "scores": scores,
-        "mean_score": mean_score,
-        "std_score": std_score,
         "X_data": X_data,
         "y_data": y_data,
         "date": date,
     }
+    
+    if mean_score:
+        metadata["mean_score"] = mean_score
+    if std_score:
+        metadata["std_score"] = std_score
+    if X_test is not None:
+        metadata["X_test"] = X_test
+    if y_test is not None:
+        metadata["y_test"] = y_test
+    
+    return metadata     
+    
