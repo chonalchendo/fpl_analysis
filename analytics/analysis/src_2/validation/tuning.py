@@ -1,5 +1,4 @@
 from typing import Literal
-import xdrlib
 import pandas as pd
 import numpy as np
 from sklearn import clone
@@ -57,7 +56,7 @@ class ModelValidator:
                     n_iter=n_iter,
                     X_valid=X_valid,
                     y_valid=y_valid,
-                    store=store
+                    store=store,
                 )
             }
             for pipeline, param in self._pipeline(X)
@@ -98,7 +97,7 @@ class ModelValidator:
             cv=cv,
             scoring=scoring,
             n_jobs=-1,
-            random_state=42, 
+            random_state=42,
         )
         random_search.fit(X, y)
         return random_search.best_estimator_, random_search.cv_results_
@@ -121,15 +120,15 @@ class ModelValidator:
             y = y.to_numpy().reshape(-1, 1)
 
         model, X_, y_ = self._preprocess(pipeline, X, y)
-        
+
         model_name = list(pipeline.named_steps.keys())[2]
         logger.info(f"tuning {model_name}")
-        
+
         best_model, _ = self._random_tune(model, param, X_, y_, cv, scoring, n_iter)
         self.tuned_models.append(best_model)
         y_pred = best_model.predict(X_)
-        
-        print(best_model) 
+
+        print(best_model)
 
         if scoring == "neg_root_mean_squared_error":
             scoring = "rmse"
@@ -158,7 +157,7 @@ class ModelValidator:
         else:
             scores = {"train_score": model_score(y_, y_pred, scoring)}
             logger.info(f"Tuning scores: {scores}")
-            
+
         metadata = model_metadata(
             model_name=model_name,
             model=best_model,
@@ -172,7 +171,7 @@ class ModelValidator:
             X_test=X_valid,
             y_test=y_valid,
         )
-            
+
         if store:
             gcp.write_model_to_bucket(
                 bucket_name="values_tuned_models",

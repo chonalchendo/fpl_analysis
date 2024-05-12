@@ -38,7 +38,7 @@ year_since_signed_feat = ApplyFunction(
     feature_names_out="feat",
 )
 
-num_transformer = make_pipeline(StandardScaler())
+num_transformer = make_pipeline(SimpleImputer(strategy="median"), StandardScaler())
 
 cat_transformer = make_pipeline(
     SimpleImputer(strategy="most_frequent"),

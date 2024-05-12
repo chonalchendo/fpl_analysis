@@ -1,5 +1,6 @@
 from typing import Callable, Literal
 import pandas as pd
+import numpy as np
 from sklearn.base import RegressorMixin
 
 from analysis.src_2.models.blend import BlendedRegressor
@@ -8,7 +9,6 @@ from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder
 
 
 def blended_prediction(
-    # pipeline: PipelineBuilder,
     models: list[RegressorMixin],
     X_train: pd.DataFrame,
     y_train: pd.DataFrame,
@@ -27,24 +27,43 @@ def blended_prediction(
         ),
     )
     pipeline = PipelineBuilder()
-    blend_pipeline = pipeline.build(X_train, blend_reg)
+    train_pipe = pipeline.build(X_train, blend_reg)
     
-    y_train_blend = blend_pipeline["target"].fit_transform(
+    y_train_blend = train_pipe["target"].fit_transform(
         y_train.to_numpy().reshape(-1, 1)
     )
-    X_train_blend = blend_pipeline["preprocess"].fit_transform(
+    X_train_blend = train_pipe["preprocess"].fit_transform(
         X_train, y_train_blend.ravel()
     )
-    model = blend_pipeline["blend"]
-    model.fit(X_train_blend, y_train_blend.ravel())
+    model = train_pipe["blend"]
 
     if X_test is not None and y_test is not None:
-        y_test_blend = blend_pipeline["target"].fit_transform(
+        test_pipe = pipeline.build(X_test, blend_reg)
+        y_test_blend = test_pipe["target"].fit_transform(
             y_test.to_numpy().reshape(-1, 1)
         )
-        X_test_blend = blend_pipeline["preprocess"].fit_transform(
+        X_test_blend = test_pipe["preprocess"].fit_transform(
             X_test, y_test_blend.ravel()
         )
+        
+        if X_train_blend.shape[1] != X_test_blend.shape[1]:
+            # find the missing columns
+            X_train_df = pd.DataFrame(
+                X_train_blend,
+                columns=train_pipe["preprocess"]["transformer"].get_feature_names_out(),
+            )
+            
+            X_test_df = pd.DataFrame(
+                X_test_blend,
+                columns=test_pipe["preprocess"]["transformer"].get_feature_names_out(),
+            )
+            
+            missing_cols = np.setxor1d(X_train_df.columns, X_test_df.columns)
+            X_train_df = X_train_df.drop(columns=missing_cols)
+            
+            X_train_blend = X_train_df.to_numpy()
+        
+        model.fit(X_train_blend, y_train_blend.ravel())
         y_pred = model.predict(X_test_blend)
         y = inverse_func(y_test_blend)
     else:

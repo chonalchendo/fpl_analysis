@@ -1,31 +1,25 @@
 import pandas as pd
+import numpy as np
 from rich import print
 from functools import lru_cache
-from sklearn.base import RegressorMixin
 
 from analysis.gcp.storage import gcp
-from analysis.src_2.utils.metrics import model_score
+from analysis.src_2.prediction import blended
+from analysis.utilities.logging import get_logger
+from analysis.src_2.testing.tester import ModelTester
+from analysis.src_2.prediction.blended import blended_prediction
 
 
+logger = get_logger(__name__)
 # make predictions
 # compare scores
 # blend predictions
 # log and save results
 
 
-def make_prediction(
-    X_train: pd.DataFrame,
-    y_train: pd.DataFrame,
-    X_test: pd.DataFrame,
-    model: RegressorMixin,
-) -> pd.DataFrame:
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    return y_pred
-
-
 @lru_cache
 def test() -> None:
+    logger.info("Loading data")
     train_set = gcp.read_df_from_bucket(
         bucket_name="values_training_data",
         blob_name="train_set_2017_2022.csv",
@@ -48,26 +42,46 @@ def test() -> None:
 
     blobs = gcp.get_gcp_bucket(bucket_name="values_tuned_models").list_blobs()
 
-    tuned_models = [
+    logger.info("Loading tuned models")
+    tuned_blobs = [
         gcp.read_model_from_bucket(
             bucket_name="values_tuned_models", blob_name=blob.name
-        )["model"]
+        )
         for blob in blobs
     ]
-    
-    predictions = [
-        make_prediction(X_train, y_train, X_test, model)
-        for model in tuned_models
+
+    tuned_models = [
+        dict((k, blob[k]) for k in ["model_name", "model"] if k in blob)
+        for blob in tuned_blobs
     ]
-    
-    print(predictions)
-    
-    scores = [
-        model_score(y_test, pred, "mae")
-        for pred in predictions
-    ]
-    
-    print(scores) 
+
+    final_models = [(model["model_name"], model["model"]) for model in tuned_models]
+    final_models_blend = [model["model"] for model in tuned_models]
+
+
+    logger.info("Testing models")
+    tester = ModelTester(models=final_models)
+
+    logger.info("Scoring models")
+    scores = tester.test(
+        X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, scoring="mae"
+    )
+
+    logger.info(scores)
+
+    logger.info("Blending predictions")
+    blended_pred = blended_prediction(
+        models=final_models_blend,
+        X_train=X_train,
+        y_train=y_train,
+        X_test=X_test,
+        y_test=y_test,
+        weights=tester.performance_weights,
+        scoring="mae",
+        inverse_func=np.expm1,
+    )
+
+    logger.info(f"Blended result: {blended_pred}")
 
 
 if __name__ == "__main__":

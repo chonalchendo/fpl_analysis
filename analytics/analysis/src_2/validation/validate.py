@@ -68,11 +68,6 @@ def validate() -> None:
 
     logger.info(blended_pred)
 
-    # load in hyperparameters
-    # tune on training data
-    # validate on validation data
-    #
-
 
 if __name__ == "__main__":
     validate()
