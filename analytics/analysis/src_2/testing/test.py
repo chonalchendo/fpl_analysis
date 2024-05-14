@@ -1,23 +1,14 @@
-import pandas as pd
 import numpy as np
-from rich import print
-from functools import lru_cache
 
 from analysis.gcp.storage import gcp
-from analysis.src_2.prediction import blended
 from analysis.utilities.logging import get_logger
 from analysis.src_2.testing.tester import ModelTester
 from analysis.src_2.prediction.blended import blended_prediction
 
 
 logger = get_logger(__name__)
-# make predictions
-# compare scores
-# blend predictions
-# log and save results
 
 
-@lru_cache
 def test() -> None:
     logger.info("Loading data")
     train_set = gcp.read_df_from_bucket(
@@ -58,13 +49,17 @@ def test() -> None:
     final_models = [(model["model_name"], model["model"]) for model in tuned_models]
     final_models_blend = [model["model"] for model in tuned_models]
 
-
     logger.info("Testing models")
     tester = ModelTester(models=final_models)
 
     logger.info("Scoring models")
     scores = tester.test(
-        X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, scoring="mae"
+        X_train=X_train,
+        y_train=y_train,
+        X_test=X_test,
+        y_test=y_test,
+        scoring="mae",
+        store=True,
     )
 
     logger.info(scores)

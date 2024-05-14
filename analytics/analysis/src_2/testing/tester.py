@@ -4,10 +4,11 @@ import numpy as np
 from sklearn.base import RegressorMixin, clone
 from sklearn.pipeline import Pipeline
 
+from analysis.gcp.storage import gcp
 from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder as pb
 from analysis.src_2.utils.metrics import model_score
 from analysis.src_2.prediction.weights import calculate_weights
-from analysis.src_2.models.blend import BlendedRegressor
+from analysis.src_2.utils.model_metadata import model_metadata
 
 
 class ModelTester:
@@ -21,6 +22,7 @@ class ModelTester:
         X_test: pd.DataFrame,
         y_test: pd.DataFrame | np.ndarray,
         scoring: Literal["rmse", "mae", "r2"],
+        store: bool = False,
     ) -> float:
 
         self.X_train_ = X_train
@@ -29,6 +31,7 @@ class ModelTester:
         self.y_test_ = y_test
         self.scoring_ = scoring
         self.test_scores = []
+        self.store_ = store
 
         return [
             {list(pipe.named_steps.keys())[2]: self._tester(pipeline=pipe)}
@@ -79,7 +82,28 @@ class ModelTester:
         score = model_score(y_test_, y_pred, self.scoring_)
         self.test_scores.append(score)
 
-        return score
+        metadata = model_metadata(
+            model_name=list(pipeline.named_steps.keys())[2],
+            model=model,
+            model_params=model.get_params(),
+            preprocess_steps=pipeline["preprocess"],
+            target_steps=pipeline["target"],
+            metric=self.scoring_,
+            scores=score,
+            X_data=self.X_train_,
+            y_data=self.y_train_,
+            X_test=self.X_test_,
+            y_test=self.y_test_,
+        )
+
+        if self.store_:
+            gcp.write_model_to_bucket(
+                bucket_name="values_tested_models",
+                blob_name=f"{list(pipeline.named_steps.keys())[2]}_model.pkl",
+                model=metadata,
+            )
+
+        return metadata
 
     @property
     def get_scores(self) -> list[float]:

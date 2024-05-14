@@ -54,3 +54,7 @@ class Models:
                 n_jobs=-1,
             ),
         )
+        
+    @property
+    def all_models(self) -> list[tuple[str, RegressorMixin]]:
+        return self.get_models + [self.get_stacked]
