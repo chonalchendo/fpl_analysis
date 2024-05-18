@@ -67,7 +67,7 @@ class GCP:
         logger.info(f"Creating blob: {blob_name}")
         blob = bucket.blob(blob_name)
 
-        blob.upload_from_string(data.to_csv(), "text/csv")
+        blob.upload_from_string(data.to_csv(index=False), "text/csv")
 
     def read_blob_from_bucket(
         self, bucket_name: str, blob_name: str

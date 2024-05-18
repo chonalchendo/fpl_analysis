@@ -9,13 +9,13 @@ console = Console(color_system="256", width=150, style="blue")
 
 @lru_cache
 def get_logger(module_name: str) -> logging.Logger:
-    """
+    """Get logger for module.
 
     Args:
-        module_name:
+        module_name (str): name of module
 
     Returns:
-
+        logging.Logger: logger for module
     """
     logger = logging.getLogger(module_name)
     handler = RichHandler(
