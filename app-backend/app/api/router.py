@@ -1,9 +1,10 @@
-from api.handlers import value_prediction
 from fastapi import APIRouter
 
-router = APIRouter()
+from app.api.handlers import value_prediction
 
-router.include_router(
+api_router = APIRouter()
+
+api_router.include_router(
     value_prediction.router,
     prefix="/value_prediction",
     tags=["value_prediction"],

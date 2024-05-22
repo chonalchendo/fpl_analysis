@@ -1,7 +1,7 @@
 import enum
 from functools import lru_cache
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class LogLevel(str, enum.Enum):
@@ -13,8 +13,8 @@ class LogLevel(str, enum.Enum):
 
 
 class Settings(BaseSettings):
-    HOSTL: str = "0.0.0.0"
-    PORT: int = 8000
+    HOST: str = "0.0.0.0"
+    PORT: int = 8001
     RELOAD: bool = False
     WORKER_COUNT: int = 1
     PROJECT_NAME: str = "Football API"
@@ -22,19 +22,19 @@ class Settings(BaseSettings):
 
     DESCRIPTION: str = "API for player valuation predictions"
 
-    GCP_PROJECT: str = ""
-    GCP_BUCKET: str = ""
-    GCP_CREDENTIALS: str = ""
+    GCP_PROJECT: str | None = None
+    GCP_BUCKET: str | None = None
+    GCP_SERVICE_ACCOUNT_JSON_PATH: str | None = None
 
     LOG_LEVEL: LogLevel = LogLevel.INFO
 
     class Config:
-        env_prefix = "APP_"
+        env_prefix = "APP_BACKEND_"
         env_file = ".env"
         case_sensitive = False
         env_file_encoding = "utf-8"
 
 
 @lru_cache()
-def settings():
+def get_settings():
     return Settings()
