@@ -48,6 +48,15 @@ def test() -> None:
     final_models = [(model["model_name"], model["model"]) for model in tuned_models]
     final_models_blend = [model["model"] for model in tuned_models]
 
+    for name, model in final_models:
+        logger.info(f"Writing model {name} to bucket")
+        gcp.write_model_to_bucket(
+            model=model,
+            bucket_name="values_final_models",
+            blob_name=f"{name}_model.pkl",
+        )
+    logger.info("Models written to bucket")
+
     logger.info("Testing models")
     tester = ModelTester(models=final_models)
 
@@ -58,7 +67,7 @@ def test() -> None:
         X_test=X_test,
         y_test=y_test,
         scoring="mae",
-        store=True,
+        store=False,
     )
 
     logger.info(scores)

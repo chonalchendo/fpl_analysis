@@ -1,10 +1,12 @@
-from google.cloud import storage
 from dataclasses import dataclass
 from typing import Any
-import pandas as pd
+
 import joblib
-from analysis.utilities.logging import get_logger
+import pandas as pd
+from google.cloud import storage
+
 from analysis.core.settings import SETTINGS
+from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -50,7 +52,8 @@ class GCP:
 
         with blob.open("wb") as f:
             joblib.dump(model, f)
-        logger.info(f"{model['model']} has been saved to {blob_name}")
+        # logger.info(f"{model['model']} has been saved to {blob_name}")
+        #
 
     def read_model_from_bucket(
         self, bucket_name: str, blob_name: str
@@ -91,7 +94,7 @@ class GCP:
 
         with blob.open("rb") as f:
             return pd.read_csv(f)
-        
+
     def write_df_to_bucket(
         self, data: pd.DataFrame, bucket_name: str, blob_name: str
     ) -> None:
