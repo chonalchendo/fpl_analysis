@@ -1,5 +1,6 @@
-import pandas as pd
 from dataclasses import dataclass
+
+import pandas as pd
 from rich import print
 
 from processing.gcp.storage import gcp
@@ -203,7 +204,6 @@ def main() -> None:
     value_leagues = ["premier_league", "bundesliga", "la_liga", "serie_a", "ligue_1"]
 
     for wage_league, value_league in zip(wage_leagues, value_leagues):
-
         logger.info(f"Loading {wage_league} wages and valuations")
         wages = DataLoader.load_wages(wage_league)
         valuations = DataLoader.load_valuations(value_league)
@@ -215,9 +215,9 @@ def main() -> None:
         gcp.write_df_to_bucket(
             bucket_name="joined_wages_values",
             blob_name=f"{value_league}_wages_values.csv",
-            data=joined_df
+            data=joined_df,
         )
-        
+
         print(joined_df)
 
     logger.info("Joining complete")

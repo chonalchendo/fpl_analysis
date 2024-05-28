@@ -1,10 +1,11 @@
 from typing import Literal
 
 from processing.src.preprocess.fbref import Clean as FbrefClean
-from processing.src.preprocess.transfermarkt import CleanTeam, CleanPlayer
+from processing.src.preprocess.transfermarkt import CleanPlayer, CleanTeam
 from processing.src.preprocess.utils import generate_unique_id
-from processing.utilities.logger import get_logger
+
 from processing.gcp.storage import gcp
+from processing.utilities.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -21,7 +22,6 @@ def process_data(
     blobs = gcp.list_blobs(f"{data_source}_db")
 
     for blob in blobs:
-
         try:
             logger.info(f"Processing {blob}")
             df = gcp.read_df_from_bucket(
