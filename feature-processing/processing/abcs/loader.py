@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 
-class GCPLoader(ABC):
+class DataLoader(ABC):
     @abstractmethod
-    def load(self, path: str) -> pd.DataFrame:
+    def load(self, bucket: str, blob: str) -> pd.DataFrame:
         pass
