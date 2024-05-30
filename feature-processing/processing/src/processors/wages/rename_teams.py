@@ -3,8 +3,8 @@ import pandas as pd
 from processing.abcs.processor import Processor
 
 
-class RenameTeams(Processor):
-    def process(self, df: pd.DataFrame) -> pd.DataFrame:
+class Process(Processor):
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         league = df["league"].values[0]
 
         if league == "la_liga":

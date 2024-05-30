@@ -3,15 +3,17 @@ from rich import print
 
 from processing.gcp.loader import GCPLoader
 from processing.src.pipeline.data import DataProcessor
-from processing.src.processors.transfermarkt.foreign_pct import ForeignPct
-from processing.src.processors.transfermarkt.signed_year import SignedYear
-from processing.src.processors.transfermarkt.team_season import TeamSeason
-from processing.src.processors.utils.cleaners import ColumnImputer
+from processing.src.processors.transfermarkt import (
+    foreign_pct,
+    signed_year,
+    team_season,
+)
+from processing.src.processors.utils.cleaners import Imputer
 
 
 def clean_player_df(blob: str) -> pd.DataFrame:
     dp = DataProcessor(
-        processors=[SignedYear(), ColumnImputer(features="height")],
+        processors=[signed_year.Process(), Imputer(features="height")],
         loader=GCPLoader(),
     )
 
@@ -20,7 +22,7 @@ def clean_player_df(blob: str) -> pd.DataFrame:
 
 def clean_team_df(blob: str) -> pd.DataFrame:
     dp = DataProcessor(
-        processors=[TeamSeason(), ForeignPct()],
+        processors=[team_season.Process(), foreign_pct.Process()],
         loader=GCPLoader(),
     )
 

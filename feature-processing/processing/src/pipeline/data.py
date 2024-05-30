@@ -28,7 +28,7 @@ class DataProcessor:
         logging.info(f"Raw data: \n{df.head()}")
 
         processed_df = reduce(
-            lambda df, processor: processor.process(df), self.processors, df
+            lambda df, processor: processor.transform(df), self.processors, df
         )
 
         if self.saver and output_path:

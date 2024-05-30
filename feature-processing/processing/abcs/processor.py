@@ -8,5 +8,5 @@ class Processor(ABC):
         self.features = features
 
     @abstractmethod
-    def process(self, data: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         pass

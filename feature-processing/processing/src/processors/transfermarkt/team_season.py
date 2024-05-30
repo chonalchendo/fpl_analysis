@@ -3,10 +3,10 @@ import pandas as pd
 from processing.abcs.processor import Processor
 
 
-class TeamSeason(Processor):
-    def __init__(self, features=None):
-        super().__init__(features)
+class Process(Processor):
+    def __init__(self) -> None:
+        super().__init__(None)
 
-    def process(self, df: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df.loc[:, "team_season"] = df["team"] + " - " + df["season"].astype(str)
         return df
