@@ -22,7 +22,11 @@ class DataProcessor:
         self.saver = saver
 
     def process(
-        self, bucket: str, blob: str, output_path: str | None = None
+        self,
+        bucket: str,
+        blob: str,
+        output_bucket: str | None = None,
+        output_blob: str | None = None,
     ) -> pd.DataFrame:
         df = self.loader.load(bucket=bucket, blob=blob)
         logging.info(f"Raw data: \n{df.head()}")
@@ -31,7 +35,9 @@ class DataProcessor:
             lambda df, processor: processor.transform(df), self.processors, df
         )
 
-        if self.saver and output_path:
-            self.saver.save(df=processed_df, path=output_path)
+        if self.saver and output_bucket and output_blob:
+            logging.info(f"Saving processed data to {output_bucket}/{output_blob}")
+            self.saver.save(bucket=output_bucket, blob=output_blob, data=processed_df)
+
         logging.info(f"Processed df: \n{processed_df.head()}")
         return processed_df
