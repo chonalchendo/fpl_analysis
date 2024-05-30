@@ -1,11 +1,12 @@
-from google.cloud import storage
 from dataclasses import dataclass
 from typing import Any
-import pandas as pd
-import joblib
-from processing.utilities.logger import get_logger
-from processing.core.settings import SETTINGS
 
+import joblib
+import pandas as pd
+from google.cloud import storage
+
+from processing.core.settings import SETTINGS
+from processing.utilities.logger import get_logger
 
 logger = get_logger(__name__)
 

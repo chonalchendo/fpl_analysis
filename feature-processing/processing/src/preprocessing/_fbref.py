@@ -1,12 +1,10 @@
-from rich import print
-
-from processing.gcp.loader import GCPLoader
+from processing.gcp.loader import CSVLoader
 from processing.gcp.saver import GCPSaver
 from processing.src.pipeline.data import DataProcessor
 from processing.src.processors.fbref import age_range, continent, country, general_pos
 
 
-def main() -> None:
+def run(blob: str, output_blob: str) -> None:
     dp = DataProcessor(
         processors=[
             general_pos.Process(),
@@ -14,12 +12,12 @@ def main() -> None:
             country.Process(),
             continent.Process(),
         ],
-        loader=GCPLoader(),
+        loader=CSVLoader(),
         saver=GCPSaver(),
     )
-    df = dp.process(bucket="fbref_db", blob="shooting.csv")
-    print(df)
-
-
-if __name__ == "__main__":
-    main()
+    dp.process(
+        bucket="fbref_db",
+        blob=blob,
+        output_bucket="processed_fbref_db",
+        output_blob=output_blob,
+    )
