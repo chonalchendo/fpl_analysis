@@ -11,3 +11,12 @@ class ColumnFilter(Processor):
     def process(self, df: pd.DataFrame) -> pd.DataFrame:
         not_like_cols = [col for col in df.columns if self.not_like not in col]
         return df[not_like_cols]
+
+
+class ColumnImputer(Processor):
+    def process(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Imputes missing height values with the median height."""
+        df.loc[
+            (df[self.features] == 0) | (df[self.features].isna()), self.features
+        ] = df[self.features].median()
+        return df
