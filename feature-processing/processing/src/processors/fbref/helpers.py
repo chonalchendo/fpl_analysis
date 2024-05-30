@@ -81,7 +81,7 @@ def get_continent(name: str) -> str:
     """
     match name:
         case name if isinstance(name, float):
-            name = "Unknown"
+            return "Unknown"
         case name if "congo" in name.lower():
             name = "congo"
         case name if "ivory" in name.lower():
@@ -97,22 +97,3 @@ def get_continent(name: str) -> str:
     continent_code = pc.country_alpha2_to_continent_code(alpha2)
     continent_name = pc.convert_continent_code_to_continent_name(continent_code)
     return continent_name
-
-    # if isinstance(name, float):
-    #     return "Unknown"
-    #
-    # if "congo" in name.lower():
-    #     name = "congo"
-    # if "ivory" in name.lower():
-    #     name = "Côte d'Ivoire"
-    # if "ireland" in name.lower():
-    #     name = "ireland"
-    # if "verde" in name.lower():
-    #     name = "verde"
-    # if "turkey" in name.lower():
-    #     name = "turkiye"
-    #
-    # alpha2 = pycountry.countries.search_fuzzy(name)[0].alpha_2
-    # continent_code = pc.country_alpha2_to_continent_code(alpha2)
-    # continent_name = pc.convert_continent_code_to_continent_name(continent_code)
-    # return continent_name

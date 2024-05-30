@@ -5,6 +5,7 @@ from processing.gcp.loader import GCPLoader
 from processing.src.pipeline.data import DataProcessor
 from processing.src.processors.transfermarkt import (
     foreign_pct,
+    player_id,
     signed_year,
     team_season,
 )
@@ -13,7 +14,11 @@ from processing.src.processors.utils.cleaners import Imputer
 
 def clean_player_df(blob: str) -> pd.DataFrame:
     dp = DataProcessor(
-        processors=[signed_year.Process(), Imputer(features="height")],
+        processors=[
+            signed_year.Process(),
+            Imputer(features="height"),
+            player_id.Process(),
+        ],
         loader=GCPLoader(),
     )
 
@@ -30,7 +35,7 @@ def clean_team_df(blob: str) -> pd.DataFrame:
 
 
 def main() -> None:
-    df = clean_team_df(blob="premier_league_team_data.csv")
+    df = clean_player_df(blob="premier_league_player_valuations.csv")
     print(df)
 
 
