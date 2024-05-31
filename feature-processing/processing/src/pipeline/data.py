@@ -29,7 +29,7 @@ class DataProcessor:
         output_blob: str | None = None,
     ) -> pd.DataFrame:
         df = self.loader.load(bucket=bucket, blob=blob)
-        logging.info(f"Raw data: \n{df.head()}")
+        logging.info(f"blob: \n{blob}")
 
         processed_df = reduce(
             lambda df, processor: processor.transform(df), self.processors, df
@@ -39,5 +39,4 @@ class DataProcessor:
             logging.info(f"Saving processed data to {output_bucket}/{output_blob}")
             self.saver.save(bucket=output_bucket, blob=output_blob, data=processed_df)
 
-        logging.info(f"Processed df: \n{processed_df.head()}")
         return processed_df

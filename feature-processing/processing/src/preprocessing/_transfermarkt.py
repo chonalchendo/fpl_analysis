@@ -1,7 +1,9 @@
-import pandas as pd
+from typing import Literal
+
 from rich import print
 
-from processing.gcp.loader import GCPLoader
+from processing.gcp.loader import CSVLoader
+from processing.gcp.saver import GCPSaver
 from processing.src.pipeline.data import DataProcessor
 from processing.src.processors.transfermarkt import (
     foreign_pct,
@@ -12,32 +14,51 @@ from processing.src.processors.transfermarkt import (
 from processing.src.processors.utils.cleaners import Imputer
 
 
-def clean_player_df(blob: str) -> pd.DataFrame:
+def clean_player_df(
+    blob: str, output_blob: str | None = None, save: Literal["yes", "no"] = "no"
+) -> None:
+    if save == "yes":
+        saver = GCPSaver()
+    else:
+        saver = None
+
     dp = DataProcessor(
         processors=[
             signed_year.Process(),
             Imputer(features="height"),
             player_id.Process(),
         ],
-        loader=GCPLoader(),
+        loader=CSVLoader(),
+        saver=saver,
     )
 
-    return dp.process(bucket="transfermarkt_db", blob=blob)
-
-
-def clean_team_df(blob: str) -> pd.DataFrame:
-    dp = DataProcessor(
-        processors=[team_season.Process(), foreign_pct.Process()],
-        loader=GCPLoader(),
+    df = dp.process(
+        bucket="transfermarkt_db",
+        blob=blob,
+        output_bucket="processed_transfermarkt_db",
+        output_blob=output_blob,
     )
-
-    return dp.process(bucket="transfermarkt_db", blob=blob)
-
-
-def main() -> None:
-    df = clean_player_df(blob="premier_league_player_valuations.csv")
     print(df)
 
 
-if __name__ == "__main__":
-    main()
+def clean_team_df(
+    blob: str, output_blob: str | None = None, save: Literal["yes", "no"] = "no"
+) -> None:
+    if save == "yes":
+        saver = GCPSaver()
+    else:
+        saver = None
+
+    dp = DataProcessor(
+        processors=[team_season.Process(), foreign_pct.Process()],
+        loader=CSVLoader(),
+        saver=saver,
+    )
+
+    df = dp.process(
+        bucket="transfermarkt_db",
+        blob=blob,
+        output_bucket="processed_transfermarkt_db",
+        output_blob=output_blob,
+    )
+    print(df)

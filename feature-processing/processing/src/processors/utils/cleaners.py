@@ -20,3 +20,8 @@ class Imputer(Processor):
             (df[self.features] == 0) | (df[self.features].isna()), self.features
         ] = df[self.features].median()
         return df
+
+
+class Rename(Processor):
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df.rename(columns=self.features)

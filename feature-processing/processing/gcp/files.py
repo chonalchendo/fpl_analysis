@@ -27,3 +27,9 @@ class GCS:
 
 
 gcs = GCS()
+
+
+if __name__ == "__main__":
+    df = gcs.read_csv("fbref_db/shooting.csv")
+    print(df)
+    print(df.columns)
