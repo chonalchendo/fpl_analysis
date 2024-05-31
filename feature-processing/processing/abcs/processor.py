@@ -10,5 +10,5 @@ class Processor(ABC):
         self.features = features
 
     @abstractmethod
-    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, data: pd.DataFrame | list[pd.DataFrame]) -> pd.DataFrame:
         pass

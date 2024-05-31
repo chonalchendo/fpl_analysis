@@ -2,12 +2,14 @@ from typing import Literal
 
 from rich import print
 
+from processing.gcp.buckets import Buckets
 from processing.gcp.loader import CSVLoader
 from processing.gcp.saver import GCPSaver
 from processing.src.pipeline.data import DataProcessor
 from processing.src.processors.transfermarkt import (
     filter_teams,
     foreign_pct,
+    map_team_names,
     player_id,
     rename_teams,
     signed_year,
@@ -24,6 +26,8 @@ def run_players(
     else:
         saver = None
 
+    league = blob.split("_")[0]
+
     dp = DataProcessor(
         processors=[
             signed_year.Process(),
@@ -31,6 +35,8 @@ def run_players(
             player_id.Process(),
             filter_teams.Process(),
             rename_teams.Process(),
+            cleaners.Rename(features={"team": "squad"}),
+            map_team_names.Process(league=league),
             cleaners.Drop(
                 features=[
                     "tm_id",
@@ -47,9 +53,9 @@ def run_players(
     )
 
     df = dp.process(
-        bucket="transfermarkt_db",
+        bucket=Buckets.TRANSFERMARKT,
         blob=blob,
-        output_bucket="processed_transfermarkt_db",
+        output_bucket=Buckets.PROCESSED_TRANSFERMARKT,
         output_blob=output_blob,
     )
     print(df)
@@ -64,15 +70,19 @@ def run_teams(
         saver = None
 
     dp = DataProcessor(
-        processors=[team_season.Process(), foreign_pct.Process()],
+        processors=[
+            team_season.Process(),
+            foreign_pct.Process(),
+            cleaners.Rename(features={"team": "squad"}),
+        ],
         loader=CSVLoader(),
         saver=saver,
     )
 
     df = dp.process(
-        bucket="transfermarkt_db",
+        bucket=Buckets.TRANSFERMARKT,
         blob=blob,
-        output_bucket="processed_transfermarkt_db",
+        output_bucket=Buckets.PROCESSED_TRANSFERMARKT,
         output_blob=output_blob,
     )
     print(df)

@@ -3,6 +3,7 @@ from typing import Literal
 from rich import print
 
 from processing.abcs.processor import Processor
+from processing.gcp.buckets import Buckets
 from processing.gcp.loader import CSVLoader
 from processing.gcp.saver import GCPSaver
 from processing.src.pipeline.data import DataProcessor
@@ -14,9 +15,9 @@ from processing.src.processors.wages import redefine_season, rename_teams
 def run_stats(blob: str, output_blob: str, save: Literal["yes", "no"] = "no") -> None:
     dp = _base(save=save)
     df = dp.process(
-        bucket="fbref_db",
+        bucket=Buckets.FBREF,
         blob=blob,
-        output_bucket="processed_fbref_db",
+        output_bucket=Buckets.PROCESSED_FBREF,
         output_blob=output_blob,
     )
     print(df)
@@ -35,9 +36,9 @@ def run_wages(blob: str, output_blob: str, save: Literal["yes", "no"] = "no") ->
         save=save,
     )
     df = dp.process(
-        bucket="fbref_db",
+        bucket=Buckets.FBREF,
         blob=blob,
-        output_bucket="processed_fbref_db",
+        output_bucket=Buckets.PROCESSED_FBREF,
         output_blob=output_blob,
     )
     print(df)

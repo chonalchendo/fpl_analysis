@@ -14,20 +14,20 @@ def main() -> None:
     transfermarkt_player = gcs.list_bucket(transfermarkt_bucket, include="player")
     transfermarkt_team = gcs.list_bucket(transfermarkt_bucket, include="team")
 
-    save = "no"
-
-    logger.info("Running preprocessing for fbref wages")
-
-    for file in fbref_wages:
-        logger.info(file)
-        _fbref.run_wages(blob=file, output_blob=f"processed_{file}", save=save)
-
-    logger.info("Running preprocessing for fbref stats")
-
-    for file in fbref_stats:
-        logger.info(file)
-        _fbref.run_stats(blob=file, output_blob=f"processed_{file}", save=save)
-
+    save = "yes"
+    #
+    # logger.info("Running preprocessing for fbref wages")
+    #
+    # for file in fbref_wages:
+    #     logger.info(file)
+    #     _fbref.run_wages(blob=file, output_blob=f"processed_{file}", save=save)
+    #
+    # logger.info("Running preprocessing for fbref stats")
+    #
+    # for file in fbref_stats:
+    #     logger.info(file)
+    #     _fbref.run_stats(blob=file, output_blob=f"processed_{file}", save=save)
+    #
     logger.info("Preprocessing for transfermarkt player data")
 
     for file in transfermarkt_player:
@@ -36,11 +36,13 @@ def main() -> None:
             blob=file, output_blob=f"processed_{file}", save=save
         )
 
-    logger.info("Preprocessing for transfermarkt team data")
-
-    for file in transfermarkt_team:
-        logger.info(f"Processing: {file}")
-        _transfermarkt.run_teams(blob=file, output_blob=f"processed_{file}", save=save)
+    # logger.info("Preprocessing for transfermarkt team data")
+    #
+    # for file in transfermarkt_team:
+    #     logger.info(f"Processing: {file}")
+    #     _transfermarkt.run_teams(blob=file, output_blob=f"processed_{file}", save=save)
+    #
+    logger.info("Preprocessing complete")
 
 
 if __name__ == "__main__":

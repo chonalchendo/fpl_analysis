@@ -38,10 +38,10 @@ gcs = GCS()
 
 
 if __name__ == "__main__":
-    # df = gcs.read_csv("fbref_db/Premier-League-wages.csv")
-    # print(df)
-    # print(df.columns)
-    wages = "Premier-League-wages.csv"
+    df = gcs.read_csv("transfermarkt_db/premier_league_player_valuations.csv")
+    print(df)
+    print(df.columns)
 
-    sp = wages.split("-")[0]
-    print(sp)
+    ps = "premier_league_player_valuations.csv"
+
+    print(ps.split("_")[0])
