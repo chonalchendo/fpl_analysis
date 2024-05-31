@@ -6,15 +6,17 @@ from processing.gcp.loader import CSVLoader
 from processing.gcp.saver import GCPSaver
 from processing.src.pipeline.data import DataProcessor
 from processing.src.processors.transfermarkt import (
+    filter_teams,
     foreign_pct,
     player_id,
+    rename_teams,
     signed_year,
     team_season,
 )
-from processing.src.processors.utils.cleaners import Imputer
+from processing.src.processors.utils import cleaners
 
 
-def clean_player_df(
+def run_players(
     blob: str, output_blob: str | None = None, save: Literal["yes", "no"] = "no"
 ) -> None:
     if save == "yes":
@@ -25,8 +27,20 @@ def clean_player_df(
     dp = DataProcessor(
         processors=[
             signed_year.Process(),
-            Imputer(features="height"),
+            cleaners.Imputer(features="height"),
             player_id.Process(),
+            filter_teams.Process(),
+            rename_teams.Process(),
+            cleaners.Drop(
+                features=[
+                    "tm_id",
+                    "tm_name",
+                    "squad_num",
+                    "contract_expiry",
+                    "current_club",
+                    "signed_date",
+                ]
+            ),
         ],
         loader=CSVLoader(),
         saver=saver,
@@ -41,7 +55,7 @@ def clean_player_df(
     print(df)
 
 
-def clean_team_df(
+def run_teams(
     blob: str, output_blob: str | None = None, save: Literal["yes", "no"] = "no"
 ) -> None:
     if save == "yes":

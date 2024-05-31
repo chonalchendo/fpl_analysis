@@ -4,10 +4,12 @@ from processing.abcs.processor import Processor
 
 
 class Process(Processor):
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        league = df["league"].values[0]
+    def __init__(self, league: str) -> None:
+        super().__init__(None)
+        self.league = league
 
-        if league == "la_liga":
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self.league == "la".lower():
             replacements = {
                 "Betis": "Real Betis",
                 "Valladolid": "Real Valladolid",
@@ -16,7 +18,7 @@ class Process(Processor):
             }
             df.loc[:, "squad"] = df["squad"].map(replacements).fillna(df["squad"])
 
-        if league == "bundesliga":
+        if self.league == "bundesliga".lower():
             df.loc[:, "squad"] = df["squad"].replace("M'Gladbach", "Monchengladbach")
 
         return df

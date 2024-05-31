@@ -25,3 +25,8 @@ class Imputer(Processor):
 class Rename(Processor):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         return df.rename(columns=self.features)
+
+
+class Drop(Processor):
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df.drop(columns=self.features)

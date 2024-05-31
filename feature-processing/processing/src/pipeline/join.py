@@ -15,10 +15,14 @@ class Datajoiner:
     def process(self, bucket: str, tables: list[str]) -> pd.DataFrame:
         dfs = [self.loader.load(bucket, table) for table in tables]
 
-        joined_df = self.join_method.process(dfs)
+        joined_df = self.join_method.transform(dfs)
 
         processed_df = pd.concat(
-            [processor.process(joined_df) for processor in self.processors], axis=1
+            [processor.transform(joined_df) for processor in self.processors], axis=1
         )
 
         return processed_df
+
+
+#
+# add in bit for preprocessors and postprocessors
