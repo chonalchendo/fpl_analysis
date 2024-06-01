@@ -11,7 +11,7 @@ class MultiJoin(Processor):
         self.on = on
         self.suffixes = suffixes
 
-    def process(self, dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    def transform(self, dfs: list[pd.DataFrame]) -> pd.DataFrame:
         return reduce(
             lambda left, right: pd.merge(
                 left, right, on=self.on, suffixes=self.suffixes

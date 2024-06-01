@@ -4,7 +4,11 @@ import pandas as pd
 
 from processing.abcs.loader import DataLoader
 from processing.abcs.processor import Processor
+from processing.abcs.saver import DataSaver
 from processing.gcp.buckets import Buckets
+from processing.utilities.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class Stats:
@@ -36,19 +40,39 @@ class ValueWage:
         self,
         join_method: Processor,
         loader: DataLoader,
+        saver: DataSaver | None = None,
         processors: list[Processor] | None = None,
     ) -> None:
         self.processors = processors
         self.join_method = join_method
         self.loader = loader
+        self.saver = saver
 
     def process(self, val_blob: str, wage_blob: str) -> pd.DataFrame:
-        val_df = self.loader.load(bucket=Buckets.PROCESSED_TRANSFERMARKT, blob=val_blob)
-        wage_df = self.loader.load(bucket=Buckets.PROCESSED_FBREF, blob=wage_blob)
+        logger.info(f"Joining {wage_blob} wages and valuations")
+
+        val_df = self.loader.load(
+            bucket=Buckets.PROCESSED_TRANSFERMARKT,
+            blob=f"processed_{val_blob}_player_valuations.csv",
+        )
+        wage_df = self.loader.load(
+            bucket=Buckets.PROCESSED_FBREF, blob=f"processed_{wage_blob}-wages.csv"
+        )
 
         joined_df = self.join_method.transform([val_df, wage_df])
 
-        processed_df = reduce(
-            lambda df, processor: processor.transform(df), self.processors, joined_df
-        )
-        return processed_df
+        if self.processors is not None:
+            joined_df = reduce(
+                lambda df, processor: processor.transform(df),
+                self.processors,
+                joined_df,
+            )
+
+        if self.saver:
+            output_blob = f"{val_blob}_wages_values.csv"
+            logger.info(f"Saving joined data to {output_blob}")
+            self.saver.save(
+                bucket=Buckets.JOINED_WAGES_VALUES, blob=output_blob, data=joined_df
+            )
+
+        return joined_df

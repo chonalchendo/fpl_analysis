@@ -30,3 +30,15 @@ class Rename(Processor):
 class Drop(Processor):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         return df.drop(columns=self.features)
+
+
+class ReplaceName(Processor):
+    def __init__(self, pattern: str, replace: str, features=None) -> None:
+        super().__init__(features)
+        self.pattern = pattern
+        self.replace = replace
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        data = df.copy()
+        data.columns = [col.replace(pattern, replace) for col in data.columns]
+        return data
