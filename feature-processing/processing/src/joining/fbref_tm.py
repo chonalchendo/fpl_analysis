@@ -19,7 +19,9 @@ def join(val_blob: str, wage_blob: str, save: Literal["yes", "no"] = "no") -> No
         processors=[cleaners.Filter(not_like="_val")],
         loader=CSVLoader(),
         saver=saver,
-        join_method=MultiJoin(on=["player", "season", "squad"], suffixes=("_val", "")),
+        join_method=MultiJoin(
+            on=["player", "season", "squad"], how="inner", suffixes=("_val", "")
+        ),
     )
     df = join.process(val_blob=val_blob, wage_blob=wage_blob)
     print(df)

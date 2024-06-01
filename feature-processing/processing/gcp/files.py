@@ -38,10 +38,16 @@ gcs = GCS()
 
 
 if __name__ == "__main__":
-    df = gcs.read_csv("transfermarkt_db/premier_league_player_valuations.csv")
-    print(df)
-    print(df.columns)
+    bucket = "joined_wages_values"
+    files = gcs.list_bucket(bucket, include="wage")
+    count = 0
+    for file in files[-1:]:
+        df = gcs.read_csv(f"{bucket}/{file}")
+        count += df.shape[0]
 
-    ps = "premier_league_player_valuations.csv"
-
-    print(ps.split("_")[0])
+    print(count)
+    # df = gcs.read_csv("transfermarkt_db/premier_league_player_valuations.csv")
+    #
+    # print(df)
+    # print(df.columns)
+    #
