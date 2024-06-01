@@ -7,13 +7,20 @@ from processing.gcp.buckets import Buckets
 from processing.gcp.loader import CSVLoader
 from processing.gcp.saver import GCPSaver
 from processing.src.pipeline.data import DataProcessor
-from processing.src.processors.fbref import age_range, continent, country, general_pos
+from processing.src.processors.fbref import (
+    age_range,
+    continent,
+    country,
+    general_pos,
+    redefine_season,
+    rename_teams,
+)
 from processing.src.processors.utils import cleaners
-from processing.src.processors.wages import redefine_season, rename_teams
 
 
 def run_stats(blob: str, output_blob: str, save: Literal["yes", "no"] = "no") -> None:
-    dp = _base(save=save)
+    league = blob.split("-")[0]
+    dp = _base(add_processors=[rename_teams.Process(league=league)], save=save)
     df = dp.process(
         bucket=Buckets.FBREF,
         blob=blob,
@@ -28,7 +35,6 @@ def run_wages(blob: str, output_blob: str, save: Literal["yes", "no"] = "no") ->
     dp = _base(
         add_processors=[
             rename_teams.Process(league=league),
-            redefine_season.Process(),
             cleaners.Drop(
                 features=["nation", "pos", "notes", "rk", "general_pos", "country"]
             ),
@@ -59,6 +65,7 @@ def _base(
         age_range.Process(),
         country.Process(),
         continent.Process(),
+        redefine_season.Process(),
     ]
     if add_processors:
         processors.extend(add_processors)

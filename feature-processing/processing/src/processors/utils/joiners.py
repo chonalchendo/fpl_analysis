@@ -18,3 +18,12 @@ class MultiJoin(Processor):
             ),
             dfs,
         )
+
+
+class Concat(Processor):
+    def __init__(self, axis: int = 0) -> None:
+        super().__init__(None)
+        self.axis = axis
+
+    def transform(self, dfs: list[pd.DataFrame]) -> pd.DataFrame:
+        return pd.concat(dfs, axis=self.axis)

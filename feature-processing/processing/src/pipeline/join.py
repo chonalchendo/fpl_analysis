@@ -6,33 +6,55 @@ from processing.abcs.loader import DataLoader
 from processing.abcs.processor import Processor
 from processing.abcs.saver import DataSaver
 from processing.gcp.buckets import Buckets
+from processing.gcp.files import gcs
 from processing.utilities.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-class Stats:
+class Bucket:
     def __init__(
-        self, processors: list[Processor], join_method: Processor, loader: DataLoader
+        self,
+        join_method: Processor,
+        loader: DataLoader,
+        saver: DataSaver | None = None,
+        processors: list[Processor] | None = None,
     ) -> None:
         self.processors = processors
         self.loader = loader
+        self.saver = saver
         self.join_method = join_method
 
-    def process(self, bucket: str, tables: list[str]) -> pd.DataFrame:
-        dfs = [self.loader.load(bucket, table) for table in tables]
+    def process(
+        self,
+        bucket: str,
+        include_blobs: str | None = None,
+        exclude_blobs: str | None = None,
+        output_blob: str | None = None,
+    ) -> pd.DataFrame:
+        logger.info(f"Searching blobs in {bucket}")
+        files = gcs.list_bucket(
+            bucket=bucket, include=include_blobs, exclude=exclude_blobs
+        )
+        logger.info(f"Found {len(files)} files in {bucket}")
+        dfs = [self.loader.load(bucket, file) for file in files]
 
+        logger.info(f"Joining {len(dfs)} dataframes")
         joined_df = self.join_method.transform(dfs)
 
-        processed_df = reduce(
-            lambda df, processor: processor.transform(df), self.processors, joined_df
-        )
+        if self.processors is not None:
+            logger.info(f"Applying {len(self.processors)} processors")
+            joined_df = reduce(
+                lambda df, processor: processor.transform(df),
+                self.processors,
+                joined_df,
+            )
 
-        # processed_df = pd.concat(
-        #     [processor.transform(joined_df) for processor in self.processors], axis=1
-        # )
+        if self.saver and output_blob:
+            logger.info(f"Saving joined data to {output_blob}")
+            self.saver.save(bucket, output_blob, joined_df)
 
-        return processed_df
+        return joined_df
 
 
 class ValueWage:
