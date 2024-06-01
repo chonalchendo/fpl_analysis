@@ -36,11 +36,9 @@ class ValueWage:
         self,
         join_method: Processor,
         loader: DataLoader,
-        preprocessors: list[Processor] | None = None,
-        postprocessors: list[Processor] | None = None,
+        processors: list[Processor] | None = None,
     ) -> None:
-        self.preprocessors = preprocessors
-        self.postprocessors = postprocessors
+        self.processors = processors
         self.join_method = join_method
         self.loader = loader
 
@@ -53,5 +51,4 @@ class ValueWage:
         processed_df = reduce(
             lambda df, processor: processor.transform(df), self.processors, joined_df
         )
-
         return processed_df
