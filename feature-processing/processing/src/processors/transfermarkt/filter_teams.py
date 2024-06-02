@@ -14,6 +14,6 @@ class Process(Processor):
         league = df["league"].values[0]
 
         if league == "bundesliga":
-            df = df.loc[df["team"] != "hannover-96"]
+            df = df.loc[df["squad"] != "hannover-96"]
 
         return df

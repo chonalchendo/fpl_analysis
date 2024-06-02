@@ -1,3 +1,4 @@
+from processing.gcp.buckets import Buckets
 from processing.gcp.files import gcs
 from processing.src.preprocessing import _fbref, _transfermarkt
 from processing.utilities.logger import get_logger
@@ -6,13 +7,10 @@ logger = get_logger(__name__)
 
 
 def main() -> None:
-    fbref_bucket = "fbref_db"
-    transfermarkt_bucket = "transfermarkt_db"
-
-    fbref_wages = gcs.list_bucket(fbref_bucket, include="wages")
-    fbref_stats = gcs.list_bucket(fbref_bucket, exclude="wages")
-    transfermarkt_player = gcs.list_bucket(transfermarkt_bucket, include="player")
-    transfermarkt_team = gcs.list_bucket(transfermarkt_bucket, include="team")
+    fbref_wages = gcs.list_bucket(Buckets.FBREF, include="wages")
+    fbref_stats = gcs.list_bucket(Buckets.FBREF, exclude="wages")
+    transfermarkt_player = gcs.list_bucket(Buckets.TRANSFERMARKT, include="player")
+    transfermarkt_team = gcs.list_bucket(Buckets.TRANSFERMARKT, include="team")
 
     save = "yes"
 

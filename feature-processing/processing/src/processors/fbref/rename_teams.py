@@ -1,4 +1,5 @@
 import pandas as pd
+from rich import print
 
 from processing.abcs.processor import Processor
 
@@ -9,7 +10,7 @@ class Process(Processor):
         self.league = league
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        if self.league == "la".lower():
+        if self.league.lower() == "la":
             replacements = {
                 "Betis": "Real Betis",
                 "Valladolid": "Real Valladolid",
@@ -18,7 +19,8 @@ class Process(Processor):
             }
             df.loc[:, "squad"] = df["squad"].map(replacements).fillna(df["squad"])
 
-        if self.league == "bundesliga".lower():
+        if self.league.lower() == "bundesliga":
             df.loc[:, "squad"] = df["squad"].replace("M'Gladbach", "Monchengladbach")
 
+        print(df["squad"].unique())
         return df

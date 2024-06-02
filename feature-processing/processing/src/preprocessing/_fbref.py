@@ -32,6 +32,7 @@ def run_stats(blob: str, output_blob: str, save: Literal["yes", "no"] = "no") ->
 
 def run_wages(blob: str, output_blob: str, save: Literal["yes", "no"] = "no") -> None:
     league = blob.split("-")[0]
+    print(league)
     dp = _base(
         add_processors=[
             rename_teams.Process(league=league),
@@ -67,7 +68,7 @@ def _base(
         continent.Process(),
         redefine_season.Process(),
     ]
-    if add_processors:
+    if add_processors is not None:
         processors.extend(add_processors)
 
     return DataProcessor(

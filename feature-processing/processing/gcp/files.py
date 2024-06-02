@@ -1,4 +1,5 @@
 import gcsfs
+import numpy as np
 import pandas as pd
 
 from processing.core.settings import SETTINGS
@@ -38,16 +39,23 @@ gcs = GCS()
 
 
 if __name__ == "__main__":
-    bucket = "joined_wages_values"
-    files = gcs.list_bucket(bucket, include="wage")
-    count = 0
-    for file in files[-1:]:
-        df = gcs.read_csv(f"{bucket}/{file}")
-        count += df.shape[0]
+    bucket = "processed_fbref_db"
+    # files = gcs.list_bucket(bucket, include="wage")
+    #
+    df = gcs.read_csv("processed_fbref_db/processed_La-Liga-wages.csv")
+    df2 = gcs.read_csv("processed_fbref_db/processed_shooting.csv")
+    df3 = gcs.read_csv(
+        "processed_transfermarkt_db/processed_la_liga_player_valuations.csv"
+    )
+    df4 = gcs.read_csv("joined_wages_values/la_liga_wages_values.csv")
+    df5 = gcs.read_csv("transfermarkt_db/la_liga_player_valuations.csv")
 
-    print(count)
-    # df = gcs.read_csv("transfermarkt_db/premier_league_player_valuations.csv")
-    #
-    # print(df)
-    # print(df.columns)
-    #
+    cols = ["player", "season", "squad"]
+    print(df[cols].head())
+    print(df3[cols].head())
+    print(df4)
+
+    joined = pd.merge(df3, df, on=cols, how="inner", suffixes=("", "_wages"))
+    print(joined["squad"].unique())
+
+    print(df3.loc[df3["player"].str.contains("Navas")])

@@ -33,9 +33,9 @@ def run_players(
             signed_year.Process(),
             cleaners.Imputer(features="height"),
             player_id.Process(),
+            cleaners.Rename(features={"team": "squad"}),
             filter_teams.Process(),
             rename_teams.Process(),
-            cleaners.Rename(features={"team": "squad"}),
             map_team_names.Process(league=league),
             cleaners.Drop(
                 features=[

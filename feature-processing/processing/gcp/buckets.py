@@ -4,3 +4,4 @@ class Buckets:
     TRANSFERMARKT = "transfermarkt_db"
     PROCESSED_TRANSFERMARKT = "processed_transfermarkt_db"
     JOINED_WAGES_VALUES = "joined_wages_values"
+    WAGE_VALS_STATS = "wage_vals_stats"

@@ -23,5 +23,5 @@ class Process(Processor):
         else:
             pattern = "^(fc-stade|stade|as|ogc|es|aj|ac|sm|ea|rc|fc-girondins|fc|sco|olympique|losc)-"
 
-        df.loc[:, "team"] = df["team"].str.replace(pattern, "", regex=True)
+        df.loc[:, "squad"] = df["squad"].str.replace(pattern, "", regex=True)
         return df
