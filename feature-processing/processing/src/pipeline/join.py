@@ -26,19 +26,37 @@ class Merge:
         self.processors = processors
 
     def process(
-        self, left_path: str, right_path: str, output_path: str | None = None
+        self,
+        left_path: str | None = None,
+        right_path: str | None = None,
+        left_df: pd.DataFrame | None = None,
+        right_df: pd.DataFrame | None = None,
+        output_path: str | None = None,
     ) -> pd.DataFrame:
-        logger.info(f"Joining {left_path} and {right_path}")
-        left_bucket = left_path.split("/")[0]
-        right_bucket = right_path.split("/")[0]
+        logger.info(f"Joining {left_path} or {left_df} and {right_path} or {right_df}")
+        if left_path is not None:
+            left_bucket = left_path.split("/")[0]
+            left_blob = left_path.split("/")[-1]
+            left_data = self.loader.load(left_bucket, left_blob)
 
-        left_blob = left_path.split("/")[-1]
-        right_blob = right_path.split("/")[-1]
+        if right_path is not None:
+            right_bucket = right_path.split("/")[0]
+            right_blob = right_path.split("/")[-1]
+            right_data = self.loader.load(right_bucket, right_blob)
 
-        left_df = self.loader.load(left_bucket, left_blob)
-        right_df = self.loader.load(right_bucket, right_blob)
+        if left_df is not None:
+            left_data = left_df
 
-        joined_df = self.join_method.transform([left_df, right_df])
+        if right_df is not None:
+            right_data = right_df
+
+        if left_path is not None and left_df is not None:
+            raise ValueError("Cannot provide both left_path and left_df")
+
+        if right_path is not None and right_df is not None:
+            raise ValueError("Cannot provide both right_path and right_df")
+
+        joined_df = self.join_method.transform([left_data, right_data])
 
         if self.processors:
             logger.info(f"Applying {len(self.processors)} processors")
@@ -73,8 +91,8 @@ class Bucket:
     def process(
         self,
         bucket: str,
-        include_blobs: str | None = None,
-        exclude_blobs: str | None = None,
+        include_blobs: list[str] | None = None,
+        exclude_blobs: list[str] | None = None,
         output_blob: str | None = None,
     ) -> pd.DataFrame:
         logger.info(f"Searching blobs in {bucket}")
@@ -82,9 +100,16 @@ class Bucket:
             bucket=bucket, include=include_blobs, exclude=exclude_blobs
         )
         logger.info(f"Found {len(files)} files in {bucket}")
-        dfs = [
-            self.loader.load(bucket, file) for file in files if output_blob not in file
-        ]
+
+        if output_blob is not None:
+            dfs = [
+                self.loader.load(bucket, file)
+                for file in files
+                if output_blob not in file
+            ]
+
+        else:
+            dfs = [self.loader.load(bucket, file) for file in files]
 
         logger.info(f"Joining {len(dfs)} dataframes")
         joined_df = self.join_method.transform(dfs)

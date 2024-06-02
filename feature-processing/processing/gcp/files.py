@@ -16,15 +16,22 @@ class GCS:
         }
 
     def list_bucket(
-        self, bucket: str, include: str | None = None, exclude: str | None = None
+        self,
+        bucket: str,
+        include: list[str] | None = None,
+        exclude: list[str] | None = None,
     ) -> list[str]:
         if include:
-            ls = [blob.split("/")[-1] for blob in self.fs.ls(bucket) if include in blob]
+            ls = [
+                blob.split("/")[-1]
+                for blob in self.fs.ls(bucket)
+                if blob.split("/")[-1] in include
+            ]
         elif exclude:
             ls = [
                 blob.split("/")[-1]
                 for blob in self.fs.ls(bucket)
-                if exclude not in blob
+                if blob.split("/")[-1] not in exclude
             ]
         else:
             ls = [blob.split("/")[-1] for blob in self.fs.ls(bucket)]
@@ -36,3 +43,8 @@ class GCS:
 
 
 gcs = GCS()
+
+if __name__ == "__main__":
+    df = gcs.read_csv("processed_fbref_db/processed_shooting.csv")
+    print(df)
+    print(df.columns)
