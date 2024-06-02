@@ -36,26 +36,3 @@ class GCS:
 
 
 gcs = GCS()
-
-
-if __name__ == "__main__":
-    bucket = "processed_fbref_db"
-    # files = gcs.list_bucket(bucket, include="wage")
-    #
-    df = gcs.read_csv("processed_fbref_db/processed_La-Liga-wages.csv")
-    df2 = gcs.read_csv("processed_fbref_db/processed_shooting.csv")
-    df3 = gcs.read_csv(
-        "processed_transfermarkt_db/processed_la_liga_player_valuations.csv"
-    )
-    df4 = gcs.read_csv("joined_wages_values/la_liga_wages_values.csv")
-    df5 = gcs.read_csv("transfermarkt_db/la_liga_player_valuations.csv")
-
-    cols = ["player", "season", "squad"]
-    print(df[cols].head())
-    print(df3[cols].head())
-    print(df4)
-
-    joined = pd.merge(df3, df, on=cols, how="inner", suffixes=("", "_wages"))
-    print(joined["squad"].unique())
-
-    print(df3.loc[df3["player"].str.contains("Navas")])
