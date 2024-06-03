@@ -1,13 +1,14 @@
 from typing import Literal
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from sklearn.base import RegressorMixin, clone
 from sklearn.pipeline import Pipeline
 
 from analysis.gcp.storage import gcp
+from analysis.src_2.prediction.weights import calculate_weights
 from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder as pb
 from analysis.src_2.utils.metrics import model_score
-from analysis.src_2.prediction.weights import calculate_weights
 from analysis.src_2.utils.model_metadata import model_metadata
 
 
@@ -24,7 +25,6 @@ class ModelTester:
         scoring: Literal["rmse", "mae", "r2"],
         store: bool = False,
     ) -> float:
-
         self.X_train_ = X_train
         self.y_train_ = y_train
         self.X_test_ = X_test
@@ -56,7 +56,6 @@ class ModelTester:
         self,
         pipeline: Pipeline,
     ) -> float:
-
         if not isinstance(self.y_train_, np.ndarray):
             self.y_train_ = self.y_train_.to_numpy().reshape(-1, 1)
 
