@@ -163,4 +163,4 @@ cython_debug/
 
 
 # custom files to ignore
-./processing/standard/
+processing/standard/

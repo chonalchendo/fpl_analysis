@@ -3,18 +3,16 @@ from typing import Literal
 from rich import print
 
 from processing.gcp.loader import CSVLoader
-from processing.gcp.saver import GCPSaver
+from processing.gcp.saver import save
 from processing.src.pipeline.join import ValueWage
 from processing.src.processors.utils import cleaners
 from processing.src.processors.utils.joiners import MultiJoin
 
 
-def join(val_blob: str, wage_blob: str, save: Literal["yes", "no"] = "no") -> None:
-    if save == "yes":
-        saver = GCPSaver()
-    else:
-        saver = None
-
+def _join(
+    val_blob: str, wage_blob: str, save_file: Literal["yes", "no"] = "no"
+) -> None:
+    saver = save(save_file)
     join = ValueWage(
         processors=[cleaners.Filter(not_like="_val")],
         loader=CSVLoader(),
@@ -32,7 +30,7 @@ def main() -> None:
     value_leagues = ["premier_league", "bundesliga", "la_liga", "serie_a", "ligue_1"]
 
     for wage, value in zip(wage_leagues, value_leagues):
-        join(value, wage, save="yes")
+        _join(value, wage, save_file="yes")
 
 
 if __name__ == "__main__":
