@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
+
 from analysis.gcp.storage import gcp
 from analysis.utilities.logging import get_logger
 
@@ -12,7 +13,6 @@ def train_valid_test_split(
     stratify_by: str = "position",
     save: bool = False,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("Input must be a non-empty pandas DataFrame")
 
@@ -44,6 +44,12 @@ def train_valid_test_split(
             data=test_set,
             bucket_name="values_test_data",
             blob_name=f"test_set_{season_split}.csv",
+        )
+
+        gcp.write_df_to_bucket(
+            data=valid_test_set,
+            bucket_name="values_test_data",
+            blob_name=f"valid_test_set_{season_split}.csv",
         )
 
     return train_set, valid_set, test_set

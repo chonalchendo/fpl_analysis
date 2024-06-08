@@ -1,18 +1,18 @@
 from typing import Literal
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from sklearn import clone
 from sklearn.base import RegressorMixin
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 
-from analysis.src_2.prediction.weights import calculate_weights
-from analysis.utilities.logging import get_logger
-from analysis.src_2.utils.metrics import model_score
-from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder
 from analysis.gcp.storage import gcp
-from analysis.src_2.utils.model_metadata import model_metadata
-
+from analysis.src.prediction.weights import calculate_weights
+from analysis.src.preprocessing.pipeline.build import PipelineBuilder
+from analysis.src.utils.metrics import model_score
+from analysis.src.utils.model_metadata import model_metadata
+from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -115,7 +115,6 @@ class ModelValidator:
         y_valid: pd.Series | np.ndarray | None = None,
         store: bool = False,
     ) -> dict:
-
         if not isinstance(y, np.ndarray):
             y = y.to_numpy().reshape(-1, 1)
 

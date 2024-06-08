@@ -6,10 +6,10 @@ from sklearn.base import RegressorMixin, clone
 from sklearn.pipeline import Pipeline
 
 from analysis.gcp.storage import gcp
-from analysis.src_2.prediction.weights import calculate_weights
-from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder as pb
-from analysis.src_2.utils.metrics import model_score
-from analysis.src_2.utils.model_metadata import model_metadata
+from analysis.src.prediction.weights import calculate_weights
+from analysis.src.preprocessing.pipeline.build import PipelineBuilder as pb
+from analysis.src.utils.metrics import model_score
+from analysis.src.utils.model_metadata import model_metadata
 
 
 class ModelTester:

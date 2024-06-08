@@ -1,11 +1,12 @@
-from typing import Literal, Any
+from typing import Any, Literal
+
 import pandas as pd
 from sklearn.base import RegressorMixin
 from sklearn.pipeline import Pipeline
 
 from analysis.gcp.storage import gcp
-from analysis.src_2.training.cross_validation import cross_validate
-from analysis.src_2.prediction.weights import calculate_weights
+from analysis.src.prediction.weights import calculate_weights
+from analysis.src.training.cross_validation import cross_validate
 
 
 class ModelTrainer:

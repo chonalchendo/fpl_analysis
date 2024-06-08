@@ -1,8 +1,8 @@
 import numpy as np
 
 from analysis.gcp.storage import gcp
-from analysis.src_2.prediction.blended import blended_prediction
-from analysis.src_2.testing.tester import ModelTester
+from analysis.src.prediction.blended import blended_prediction
+from analysis.src.testing.tester import ModelTester
 from analysis.utilities.logging import get_logger
 
 logger = get_logger(__name__)

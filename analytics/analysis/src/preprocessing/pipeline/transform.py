@@ -1,19 +1,18 @@
-from sklearn.pipeline import make_pipeline, FeatureUnion
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, TargetEncoder
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
+from sklearn.pipeline import FeatureUnion, make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, TargetEncoder
 
-from analysis.src_2.preprocessing.feature_engineering.dimension_reduction import (
+from analysis.src.preprocessing.feature_engineering.dimension_reduction import (
     ClusterSimilarity,
 )
-from analysis.src_2.preprocessing.transformers.functional import ApplyFunction
-from analysis.src_2.preprocessing.feature_engineering.feature_creation import (
+from analysis.src.preprocessing.feature_engineering.feature_creation import (
     create_league_signed_from_col,
     create_penalty_taker_col,
     create_years_since_signed_col,
     create_youth_player_col,
 )
-
+from analysis.src.preprocessing.transformers.functional import ApplyFunction
 
 youth_player_feat = ApplyFunction(
     feature="is_youth_player", apply_func=create_youth_player_col, return_type="pandas"

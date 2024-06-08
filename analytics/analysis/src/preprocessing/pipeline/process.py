@@ -1,10 +1,10 @@
 from sklearn.pipeline import make_pipeline
-from analysis.src_2.preprocessing.transformers.imputers import (
+
+from analysis.src.preprocessing.transformers.imputers import (
     BoolImputer,
     CustomImputer,
     GroupbyImputer,
 )
-
 
 signed_from_impute = CustomImputer(
     features="signed_from", value="Unknown", return_type="pandas"

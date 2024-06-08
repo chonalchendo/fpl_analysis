@@ -2,19 +2,17 @@ import numpy as np
 from sklearn.model_selection import KFold
 
 from analysis.gcp.storage import gcp
+from analysis.src.models.regressors import Models
+from analysis.src.prediction.blended import blended_prediction
+from analysis.src.preprocessing.pipeline.build import PipelineBuilder
+from analysis.src.training.model_trainer import ModelTrainer
+from analysis.src.utils.data_splitter import train_valid_test_split
 from analysis.utilities.logging import get_logger
-from analysis.src_2.utils.data_splitter import train_valid_test_split
-from analysis.src_2.preprocessing.pipeline.build import PipelineBuilder
-from analysis.src_2.training.model_trainer import ModelTrainer
-from analysis.src_2.models.regressors import Models
-from analysis.src_2.prediction.blended import blended_prediction
-
 
 logger = get_logger(__name__)
 
 
 def train() -> None:
-
     df = gcp.read_df_from_bucket(
         bucket_name="wage_vals_stats", blob_name="standard.csv"
     )
@@ -49,7 +47,7 @@ def train() -> None:
         scoring="mae",
         inverse_func=np.expm1,
     )
-    
+
     logger.info(blended_pred)
 
 
