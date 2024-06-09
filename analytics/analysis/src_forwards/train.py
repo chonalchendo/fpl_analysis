@@ -5,7 +5,7 @@ from analysis.gcp.loader import CSVLoader
 from analysis.src_forwards.cross_validate import CrossValidate
 from analysis.src_forwards.models import forwards_pipeline, regressors
 from analysis.src_forwards.preprocessing.pipeline import forwards_preprocessor
-from analysis.src_forwards.training._trainer import ModelTrainer
+from analysis.src_forwards.training import ModelTrainer
 
 
 def main() -> None:
