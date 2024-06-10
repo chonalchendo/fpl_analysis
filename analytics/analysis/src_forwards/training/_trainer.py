@@ -17,7 +17,7 @@ class ModelTrainer:
     def __init__(
         self,
         preprocessor: BaseComposer,
-        sklearn_pipeline: Callable | Pipeline,
+        sklearn_pipeline: Callable,
         models: list[RegressorMixin],
         cv: CrossValidator,
         loader: DataLoader,
@@ -33,7 +33,7 @@ class ModelTrainer:
         df = self.loader.load(input_path)
 
         logger.info("Splitting data into train, validation, and test sets")
-        train_set, _, _ = train_valid_test_split(df, season_split=2023)
+        train_set, _, _, _ = train_valid_test_split(df, season_split=2023)
 
         logger.info("Preprocessing data")
         train_set_ = self.preprocessor.compose(train_set)

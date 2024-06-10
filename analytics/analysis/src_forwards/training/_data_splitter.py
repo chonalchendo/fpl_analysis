@@ -12,7 +12,7 @@ def train_valid_test_split(
     season_split: int,
     stratify_by: str = "position",
     save: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("Input must be a non-empty pandas DataFrame")
 
@@ -52,4 +52,4 @@ def train_valid_test_split(
             blob_name=f"valid_test_set_{season_split}.csv",
         )
 
-    return train_set, valid_set, test_set
+    return train_set, valid_set, test_set, valid_test_set
