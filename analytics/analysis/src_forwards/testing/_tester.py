@@ -2,11 +2,8 @@ from typing import Callable
 
 import pandas as pd
 from sklearn.base import RegressorMixin
-from sklearn.pipeline import Pipeline
 
-from analysis.base.compose import BaseComposer
-from analysis.base.data_loader import DataLoader
-from analysis.base.test import Tester
+from analysis.base import BaseComposer, DataLoader, DataSaver, Tester
 from analysis.src_forwards.training import train_valid_test_split
 from analysis.utilities.logging import get_logger
 
@@ -21,14 +18,16 @@ class ModelTester:
         models: list[RegressorMixin],
         tester: Tester,
         loader: DataLoader,
+        saver: DataSaver,
     ) -> None:
         self.preprocessor = preprocessor
         self.sklearn_pipeline = sklearn_pipeline
         self.models = models
         self.tester = tester
         self.loader = loader
+        self.saver = saver
 
-    def run(self, input_path: str, target_variable: str) -> None:
+    def run(self, target_variable: str, input_path: str, output_path: str) -> None:
         logger.info(f"Loading data from {input_path}")
         df = self.loader.load(input_path)
 
@@ -65,6 +64,10 @@ class ModelTester:
 
         logger.info("Blending models")
         self.tester.blend(y_test=y_test)
+
+        if self.saver is not None and output_path is not None:
+            logger.info("Saving predictions")
+            self.saver.save(self.pred_results_, output_path=output_path)
 
     @property
     def pred_results_(self) -> pd.DataFrame:
