@@ -1,30 +1,20 @@
 from rich import print
-from sklearn.model_selection import KFold
 
-from analysis.gcp.loader import CSVLoader
-from analysis.src_forwards.cross_validate import CrossValidate
-from analysis.src_forwards.models import forwards_pipeline, regressors
-from analysis.src_forwards.preprocessing.pipeline import forwards_preprocessor
+from analysis.src_forwards.config import ForwardsTrain as Settings
 from analysis.src_forwards.training import ModelTrainer
 
 
 def main() -> None:
-    cv = CrossValidate(
-        metric="neg_mean_absolute_error",
-        method=KFold(n_splits=5, shuffle=True, random_state=42),
-    )
-    models = regressors.models
-
     trainer = ModelTrainer(
-        preprocessor=forwards_preprocessor,
-        sklearn_pipeline=forwards_pipeline,
-        models=models,
-        cv=cv,
-        loader=CSVLoader(),
+        preprocessor=Settings.PREPROCESSOR,
+        sklearn_pipeline=Settings.PIPELINE,
+        models=Settings.MODELS,
+        cv=Settings.CV,
+        loader=Settings.LOADER,
     )
     trainer.run(
-        input_path="wage_vals_stats/forwards.csv",
-        target_variable="market_value_euro_mill",
+        input_path=Settings.INPUT,
+        target_variable=Settings.TARGET,
     )
 
     print(trainer.cv_results_)
