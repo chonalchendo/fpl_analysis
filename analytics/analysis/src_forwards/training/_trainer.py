@@ -2,11 +2,8 @@ from typing import Callable
 
 import pandas as pd
 from sklearn.base import RegressorMixin
-from sklearn.pipeline import Pipeline
 
-from analysis.base.compose import BaseComposer
-from analysis.base.cross_val import CrossValidator
-from analysis.base.data_loader import DataLoader
+from analysis.base import BaseComposer, CrossValidator, DataLoader
 from analysis.src_forwards.training._data_splitter import train_valid_test_split
 from analysis.utilities.logging import get_logger
 
