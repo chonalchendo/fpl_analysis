@@ -13,12 +13,9 @@ COPY ./app-backend/poetry.lock /app/src
 
 RUN poetry install --no-interaction --no-root -vvv
 
-ADD ./app-backend/app /app/src
-
-#
-# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"] 
+ADD ./app-backend /app/src
 
 RUN chmod +x run.sh
 
-CMD ['bash', './run.sh']
+CMD ["bash", "./run.sh"]
 
