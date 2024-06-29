@@ -16,8 +16,8 @@ class GCP:
     """Dataclass for interacting with Google Cloud Platform."""
 
     # bucket_name: str = SETTINGS["GOOGLE_CLOUD_BUCKET_NAME"]
-    bucket_project: str = SETTINGS["GOOGLE_CLOUD_PROJECT"]
-    json_creds_path: str = SETTINGS["GOOGLE_CLOUD_SERVICE_ACCOUNT_JSON_PATH"]
+    bucket_project: str = SETTINGS["APP_BACKEND_GCP_PROJECT"]
+    json_creds_path: str = SETTINGS["APP_BACKEND_GCP_SERVICE_ACCOUNT_JSON_PATH"]
 
     def get_gcp_bucket(self, bucket_name: str) -> storage.Bucket:
         """Get the GCP bucket object.
@@ -93,6 +93,26 @@ class GCP:
 
         with blob.open("rb") as f:
             return pd.read_csv(f)
+
+    def read_df_from_bucket_parquet(
+        self, bucket_name: str, blob_name: str
+    ) -> pd.DataFrame | None:
+        """Reads a file from the bucket.
+
+        Args:
+            blob_name (str): name of blob in bucket
+
+        Returns:
+            pd.DataFrame: dataframe of blob contents
+        """
+        bucket = self.get_gcp_bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+
+        if not blob.exists():
+            return None
+
+        with blob.open("rb") as f:
+            return pd.read_parquet(f)
 
     def write_df_to_bucket(
         self, data: pd.DataFrame, bucket_name: str, blob_name: str
