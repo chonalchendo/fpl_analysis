@@ -1,14 +1,24 @@
 version: '3.11'
 
 services:
+  frontend:
+    build:
+        dockerfile: app-frontend/Dockerfile
+    image: app-frontend:${APP_FRONTEND_VERSION:-latest}
+    restart: always
+    ports:
+      - 8501:8501
+    depends_on:
+      - app 
   app:
     build:
         dockerfile: app-backend/Dockerfile
     image: app-backend:${APP_BACKEND_VERSION:-latest}
     restart: always
     volumes:
-      - ./credentials:/app/src/credentials
+      - ./credentials:/app/src/creds
     env_file:
       - app-backend/.env    
     ports:
       - 8001:8001
+
