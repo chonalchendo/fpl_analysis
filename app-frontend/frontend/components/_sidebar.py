@@ -3,10 +3,10 @@ from models import Query
 from services import get_dropdowns
 
 
-def configure_sidebar() -> Query | None:
+def configure_sidebar() -> Query:
     dropdowns = get_dropdowns()
-    # create query form for user input
 
+    # create query form for user input
     with st.sidebar.form(key="query_form"):
         st.write("## Filters")
 
