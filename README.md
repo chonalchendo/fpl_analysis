@@ -60,13 +60,15 @@ Running this will allow you to reload the web app in real-time as you make chang
 
 3. Access the web application
 
-The web application can be accessed at [http://localhost:8501](http://localhost:8501)
+Once the Docker container is running:
+
+the web application can be accessed at [http://localhost:8501](http://localhost:8501)\n
 FastAPI can be queried directly at [http://localhost:8000](http://localhost:8000)
 
 ## Screenshots
 
-![Landing Page](/Users/conal/Projects/fpl_app/images/fpl_greeting_page.png)
-![Predictions Page](/Users/conal/Projects/fpl_app/images/fpl_query_result.png)
+![Landing Page](./images/fpl_greeting_page.png)\n
+![Predictions Page](./images/fpl_query_result.png)
 
 ## Technologies Used
 
