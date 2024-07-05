@@ -12,7 +12,7 @@ This project is a web application that predicts the value of a football player b
 
 ## Table of Contents
 
-[Installation](#installation)\n
+[Installation](#installation)\
 [Usage](#usage)
 
 ## Installation
@@ -37,8 +37,8 @@ The Docker version used for this project is v4.32.0
 
 Instructions on how to install Docker can be found at the following links:
 
-[Linux](https://docs.docker.com/desktop/install/linux-install/)\n
-[Mac](https://docs.docker.com/desktop/install/mac-install/)\n
+[Linux](https://docs.docker.com/desktop/install/linux-install/)\
+[Mac](https://docs.docker.com/desktop/install/mac-install/)\
 [Windows](https://docs.docker.com/desktop/install/windows-install/)
 
 ## Usage
@@ -62,12 +62,16 @@ Running this will allow you to reload the web app in real-time as you make chang
 
 Once the Docker container is running:
 
-the web application can be accessed at [http://localhost:8501](http://localhost:8501)\n
+the web application can be accessed at [http://localhost:8501](http://localhost:8501)\
 FastAPI can be queried directly at [http://localhost:8000](http://localhost:8000)
 
 ## Screenshots
 
+The landing page
 ![Landing Page](./images/fpl_greeting_page.png)\n
+
+## Screenshots
+
 ![Predictions Page](./images/fpl_query_result.png)
 
 ## Technologies Used
