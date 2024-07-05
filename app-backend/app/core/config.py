@@ -1,5 +1,6 @@
 import enum
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings
 
@@ -22,9 +23,17 @@ class Settings(BaseSettings):
 
     DESCRIPTION: str = "API for player valuation predictions"
 
+    # buckets for gcp storage in deployment
     GCP_PROJECT: str | None = None
     GCP_BUCKET: str | None = None
     GCP_SERVICE_ACCOUNT_JSON_PATH: str | None = None
+
+    # buckets for gcp storage in local development
+    LOCAL_GCP_PROJECT: str | None = None
+    LOCAL_GCP_BUCKET: str | None = None
+    LOCAL_GCP_SERVICE_ACCOUNT_JSON_PATH: str | None = None
+
+    PREDICTIONS: Path = Path().cwd() / "app" / "data" / "predictions.parquet"
 
     LOG_LEVEL: LogLevel = LogLevel.INFO
 
