@@ -1,0 +1,13 @@
+version: '4.2'
+
+services:
+  frontend:
+    volumes:
+    - ./app-frontend:/app/src/
+
+  app:
+    volumes:
+    - ./app-backend:/app/src/
+    environment:
+      # Enables autoreload.
+      APP_API_RELOAD: "True"
