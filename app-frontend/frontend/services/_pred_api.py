@@ -4,7 +4,7 @@ from core.settings import API_URL
 from models import Query
 
 
-def query_api(query: Query | None) -> pd.DataFrame:
+def query_api(query: Query) -> pd.DataFrame:
     if query is not None:
         params = query.to_dict()
 
@@ -13,4 +13,5 @@ def query_api(query: Query | None) -> pd.DataFrame:
             params=params,
         ).json()
 
-    return pd.DataFrame(response)
+        if response:
+            return pd.DataFrame(response)
