@@ -6,13 +6,13 @@ Football Player Value Prediction App
 
 This project is a web application that predicts the value of a football player based on performance attributes for the 2023/24 season.
 
-The model used is a RandomForestRegressor which is trained on data from the 2017/18 to 2022/23 seasons.
+\nThe model used is a RandomForestRegressor which is trained on data from the 2017/18 to 2022/23 seasons.
 
-The user can filter the results dataframe based on the player country, position, and league via the web application's user interface built using Streamlit.
+\nThe user can filter the results dataframe based on the player country, position, and league via the web application's user interface built using Streamlit.
 
 ## Table of Contents
 
-[Installation](#installation)
+[Installation](#installation)\n
 [Usage](#usage)
 
 ## Installation
@@ -35,8 +35,10 @@ For further instructions on how to install Poetry, visit the [Poetry documentati
 
 The Docker version used for this project is v4.32.0
 
-[Linux](https://docs.docker.com/desktop/install/linux-install/)
-[Mac](https://docs.docker.com/desktop/install/mac-install/)
+Instructions on how to install Docker can be found at the following links:
+
+[Linux](https://docs.docker.com/desktop/install/linux-install/)\n
+[Mac](https://docs.docker.com/desktop/install/mac-install/)\n
 [Windows](https://docs.docker.com/desktop/install/windows-install/)
 
 ## Usage
