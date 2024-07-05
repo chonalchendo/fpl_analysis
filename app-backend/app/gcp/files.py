@@ -1,18 +1,26 @@
 import gcsfs
 import joblib
 import pandas as pd
-from rich import print
 
 from app.core.config import get_settings
 
 
 class GCS:
-    def __init__(self):
+    def __init__(self, local: bool = False):
+        if local:
+            project = get_settings().LOCAL_GCP_PROJECT
+            service_account_json_path = (
+                get_settings().LOCAL_GCP_SERVICE_ACCOUNT_JSON_PATH
+            )
+        else:
+            project = get_settings().GCP_PROJECT
+            service_account_json_path = get_settings().GCP_SERVICE_ACCOUNT_JSON_PATH
+
         self.fs = gcsfs.GCSFileSystem(
-            project=get_settings().GCP_PROJECT,
-            token=get_settings().GCP_SERVICE_ACCOUNT_JSON_PATH,
+            project=project,
+            token=service_account_json_path,
         )
-        self.storage_options = {"token": get_settings().GCP_SERVICE_ACCOUNT_JSON_PATH}
+        self.storage_options = {"token": service_account_json_path}
 
     def read_csv(self, path: str) -> pd.DataFrame:
         load = f"gcs://{path}"
@@ -32,6 +40,3 @@ class GCS:
 
     def ls(self, bucket: str) -> list:
         return self.fs.ls(bucket)
-
-
-gcs = GCS()
